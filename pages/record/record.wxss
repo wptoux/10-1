@@ -1,0 +1,48 @@
+/* pages/record/record.wxss */
+
+/*弹幕飞飞飞*/
+.barrage-fly{
+    z-index: 3;
+    height: 80%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+}
+.barrage-textFly{
+    position: absolute;
+}
+
+.recorder{
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  bottom: 50rpx;
+}
+
+.record-hinter{
+  position: relative;
+  margin: 0 auto;
+  width: 500rpx;
+  height: 3rem;
+  line-height: 3rem;
+}
+
+.record-hinter text{
+  color:ghostwhite;
+}
+
+.record-hinter image{
+  position: absolute;
+  left: 0rpx;
+  top: 0rpx;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+}
+
+.record-btn{
+  width: 150rpx;
+  height: 150rpx;
+  margin-top: 3px;
+}
+

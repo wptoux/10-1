@@ -1,0 +1,9 @@
+<!--index.wxml-->
+<view class="container">
+  <view class="front-page-image">
+    <image wx:if="{{isImageReady}}" src="{{imageSrc}}" style='width:480rpx;height: 300rpx'>
+    </image>
+  </view>
+  
+  <button class='btn-start' bindtap='onStartTap'>start</button>
+</view>
