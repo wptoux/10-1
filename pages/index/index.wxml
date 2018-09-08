@@ -5,5 +5,5 @@
     </image>
   </view>
   
-  <button class='btn-start' bindtap='onStartTap'>start</button>
+  <button class='btn-start' open-type='getUserInfo' bindgetuserinfo="onGotUserInfo">start</button>
 </view>

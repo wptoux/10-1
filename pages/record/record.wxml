@@ -12,7 +12,7 @@
   </view> 
   <view class="recorder">
     <view class="record-hinter" wx:if="{{isHintReady}}">
-      <text>123</text>
+      <text>{{hintText}}</text>
       <image src="{{hintImgSrc}}"></image>
     </view>
     <image class='record-btn' src='record-btn.jpg' bindtouchstart='onRecordPressed' bindtouchend='onRecordReleased' bindtouchcancel='onRecordCancelled'></image>
