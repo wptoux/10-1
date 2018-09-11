@@ -1,6 +1,5 @@
 // pages/record/record.js
 var timer;
-var recordData;
 var app = getApp()
 Page({
 
@@ -99,9 +98,9 @@ Page({
     wx.getRecorderManager().onStop((res) => {
       console.info('Record result:')
       console.info(res)
-      recordData = res.tempFilePath
+      let recordFilePath = res.tempFilePath
       wx.navigateTo({
-        url: '../share/share?record_data=' + encodeURI(recordData),
+        url: '../share/share?recordFilePath=' + encodeURIComponent(recordFilePath),
       })
 
     })

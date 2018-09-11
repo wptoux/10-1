@@ -9,10 +9,6 @@ Page({
   },
 
   onGotUserInfo: function (e) {
-    wx.navigateTo({
-      url: '../record/record',
-    })
-
     console.info("User Info:")
     console.log(e)
     // 登录
@@ -35,6 +31,9 @@ Page({
             if (resLogin.statusCode == 200 && resLogin.data.code == 1) {
               app.globalData.cookie = resLogin.header['Set-Cookie']
               app.globalData.loginStatus = 1
+              wx.navigateTo({
+                url: '../record/record',
+              })
             }
             else{
               console.warn('Server login failed...')
