@@ -44,32 +44,7 @@ Page({
     })
     this.openBarrage()
 
-    //获取Hint
-    wx.request({
-      url: app.globalData.baseUrl + '/greeting/random',
-      method: 'GET',
-      header: {
-        'cookie': app.globalData.cookie
-      },
-      success: (res) => {
-        console.info('Get hint status:')
-        console.info(res)
-        if (res.statusCode == 200 && res.data.code == 1){
-          that.setData({
-            isHintReady: true,
-            hintImgSrc: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535798551&di=2ef16e231335625e1a51e898fc6cc612&imgtype=jpg&er=1&src=http%3A%2F%2Fwww.wallcoo.com%2Fcartoon%2FKitsunenoir_Design_Illustration_V%2Fwallpapers%2F2560x1440%2Fkim-holtermand-reflections.jpg",
-            hintText: res.data.data.content
-          })
-        }
-        else{
-          that.setData({
-            isHintReady: true,
-            hintImgSrc: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535798551&di=2ef16e231335625e1a51e898fc6cc612&imgtype=jpg&er=1&src=http%3A%2F%2Fwww.wallcoo.com%2Fcartoon%2FKitsunenoir_Design_Illustration_V%2Fwallpapers%2F2560x1440%2Fkim-holtermand-reflections.jpg",
-            hintText: "祖国您好~"
-          })
-        }
-      }
-    })
+    this.getHint()
 
     //获取弹幕
     let texts = null;
@@ -84,13 +59,15 @@ Page({
         console.info('Get list status:')
         console.info(res)
         if (res.statusCode == 200 && res.data.code == 1 && res.data.data.length > 0) {
-          texts = res.data.data
+          for (let d of res.data.data){
+            console.log(d)
+            that.shoot(d.greeting.content, d.user.avatarUrl, d.id)
+          }
         } else {
           texts = ["123", "234", "345", "456", "678", "789"]
-        }
-
-        for (var i = 0; i < texts.length; i++) {
-          that.shoot(texts[i])
+          for (let i = 0; i < texts.length; i++) {
+            that.shoot(texts[i], "")
+          }
         }
       }
     })
@@ -152,7 +129,7 @@ Page({
     });
   },
 
-  shoot: function(text) {
+  shoot: function(text, avatarURI, voiceId) {
     //字体颜色随机
     var textColor = "rgb(" + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + ")";
     var top = (Math.random()) * this.data.phoneHeight * 0.65;
@@ -161,7 +138,9 @@ Page({
       text: text,
       color: textColor,
       left: (Math.random()) * this.data.phoneWidth,
-      speed: Math.random() * 20 + 10
+      speed: Math.random() * 20 + 10,
+      avatar: avatarURI,
+      voiceId: voiceId
     };
     var barrage_style_arr = this.data.barrage_style;
     barrage_style_arr.push(barrage_style_obj);
@@ -170,4 +149,34 @@ Page({
       barrage_style: barrage_style_arr
     })
   },
+
+  getHint: function(){
+    var that = this
+    //获取Hint
+    wx.request({
+      url: app.globalData.baseUrl + '/greeting/random',
+      method: 'GET',
+      header: {
+        'cookie': app.globalData.cookie
+      },
+      success: (res) => {
+        console.info('Get hint status:')
+        console.info(res)
+        if (res.statusCode == 200 && res.data.code == 1) {
+          that.setData({
+            isHintReady: true,
+            hintImgSrc: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535798551&di=2ef16e231335625e1a51e898fc6cc612&imgtype=jpg&er=1&src=http%3A%2F%2Fwww.wallcoo.com%2Fcartoon%2FKitsunenoir_Design_Illustration_V%2Fwallpapers%2F2560x1440%2Fkim-holtermand-reflections.jpg",
+            hintText: res.data.data.content
+          })
+        }
+        else {
+          that.setData({
+            isHintReady: true,
+            hintImgSrc: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535798551&di=2ef16e231335625e1a51e898fc6cc612&imgtype=jpg&er=1&src=http%3A%2F%2Fwww.wallcoo.com%2Fcartoon%2FKitsunenoir_Design_Illustration_V%2Fwallpapers%2F2560x1440%2Fkim-holtermand-reflections.jpg",
+            hintText: "祖国您好~"
+          })
+        }
+      }
+    })
+  }
 })

@@ -1,25 +1,41 @@
 /* pages/record/record.wxss */
 
 /*弹幕飞飞飞*/
-.barrage-fly{
-    z-index: 3;
-    height: 80%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-}
-.barrage-textFly{
-    position: absolute;
+.barrage-fly {
+  z-index: 3;
+  height: 80%;
+  width: 100%;
+  position: absolute;
+  top: 0;
 }
 
-.recorder{
+.barrage-fly-obj {
+  position: absolute;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  overflow: hidden;
+}
+
+.barrage-fly-obj image {
+  float:left;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.barrage-fly-obj text {
+  float:right;
+  margin-left: 0.5rem;
+  font-size: 1rem;
+}
+
+.recorder {
   position: absolute;
   width: 100%;
   text-align: center;
   bottom: 50rpx;
 }
 
-.record-hinter{
+.record-hinter {
   position: relative;
   margin: 0 auto;
   width: 500rpx;
@@ -27,11 +43,11 @@
   line-height: 3rem;
 }
 
-.record-hinter text{
-  color:ghostwhite;
+.record-hinter text {
+  color: ghostwhite;
 }
 
-.record-hinter image{
+.record-hinter image {
   position: absolute;
   left: 0rpx;
   top: 0rpx;
@@ -40,9 +56,8 @@
   height: 100%;
 }
 
-.record-btn{
+.record-btn {
   width: 150rpx;
   height: 150rpx;
   margin-top: 3px;
 }
-

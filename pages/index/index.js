@@ -21,7 +21,7 @@ Page({
         params['wxCode'] = res.code
         
         wx.request({
-          url: app.globalData.baseUrl + '/user/logintest',
+          url: app.globalData.baseUrl + '/user/login',
           data: params,
           method: 'POST',
           success: (resLogin) => {

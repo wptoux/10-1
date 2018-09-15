@@ -2,14 +2,17 @@
 <!--弹幕上单文字-->
 <view class="barrage-fly" style="display:{{barragefly_display}}">
   <block wx:for="{{barrage_style}}" wx:key="unique">
-   <text class="barrage-textFly" style="color:{{item.color}};left:{{item.left}}px;top:{{item.top}}px;">{{item.text}}</text>
+    <view class="barrage-fly-obj" style="color:{{item.color}};left:{{item.left}}px;top:{{item.top}}px;">
+      <image src="{{item.avatar}}"></image>
+      <text >{{item.text}}</text>
+    </view>
   </block>
 </view>
 
 <view class="container">
   <view class="show-block">
 
-  </view> 
+  </view>
   <view class="recorder">
     <view class="record-hinter" wx:if="{{isHintReady}}">
       <text>{{hintText}}</text>
