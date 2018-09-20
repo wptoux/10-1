@@ -1,23 +1,18 @@
 <!--pages/record/record.wxml-->
-<!--弹幕上单文字-->
+<!--弹幕-->
 <view class="barrage-fly" style="display:{{barragefly_display}}">
   <block wx:for="{{barrage_style}}" wx:key="unique">
     <view class="barrage-fly-obj" style="color:{{item.color}};left:{{item.left}}px;top:{{item.top}}px;">
       <image src="{{item.avatar}}"></image>
-      <text >{{item.text}}</text>
+      <text>{{item.text}}</text>
     </view>
   </block>
 </view>
 
-<view class="container">
-  <view class="show-block">
 
-  </view>
-  <view class="recorder">
-    <view class="record-hinter" wx:if="{{isHintReady}}">
-      <text>{{hintText}}</text>
-      <image src="{{hintImgSrc}}"></image>
-    </view>
-    <image class='record-btn' src='record-btn.jpg' bindtouchstart='onRecordPressed' bindtouchend='onRecordReleased' bindtouchcancel='onRecordCancelled'></image>
-  </view>
+<view class="record-hinter" bindtap='getHint'>
+  <text>{{hintText}}</text>
+  <image src="{{hintImgSrc}}"></image>
 </view>
+
+<image class='record-btn' src='record-btn.jpg' bindtouchstart='onRecordPressed' bindtouchend='onRecordReleased' bindtouchcancel='onRecordCancelled'></image>

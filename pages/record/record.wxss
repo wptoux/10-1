@@ -3,7 +3,7 @@
 /*弹幕飞飞飞*/
 .barrage-fly {
   z-index: 3;
-  height: 80%;
+  height: 70%;
   width: 100%;
   position: absolute;
   top: 0;
@@ -28,19 +28,16 @@
   font-size: 1rem;
 }
 
-.recorder {
-  position: absolute;
-  width: 100%;
-  text-align: center;
-  bottom: 50rpx;
-}
-
 .record-hinter {
-  position: relative;
-  margin: 0 auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
   width: 500rpx;
   height: 3rem;
   line-height: 3rem;
+  text-align: center;
+  bottom: 210rpx;
 }
 
 .record-hinter text {
@@ -57,7 +54,11 @@
 }
 
 .record-btn {
+  left: 0;
+  right: 0;
+  margin: auto;
+  position: absolute;
+  bottom: 50rpx;
   width: 150rpx;
   height: 150rpx;
-  margin-top: 3px;
 }
