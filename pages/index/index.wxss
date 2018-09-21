@@ -1,5 +1,16 @@
 /**index.wxss**/
 
 .btn-start{
-  margin-top: 250rpx;
+  position: absolute;
+  bottom: 150rpx;
+  width: 150rpx;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+.page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }

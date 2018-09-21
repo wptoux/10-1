@@ -1,1 +1,89 @@
 /* pages/share/share.wxss */
+
+.page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.sim-desc {
+  position: absolute;
+  top: 130rpx;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 600rpx;
+  height: 300rpx;
+  text-align: center;
+  line-height: 120rpx;
+}
+
+.sim-desc image{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 600rpx;
+  height: 300rpx;
+  z-index: -1;
+}
+
+.user-cnt-desc {
+  position: absolute;
+  top: 350rpx;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 600rpx;
+  height: 200rpx;
+}
+
+.avatar {
+  position: absolute;
+}
+
+.badge {
+  position: absolute;
+  
+  width: 75rpx;
+  height: 75rpx;
+}
+
+.user-cnt-desc-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+}
+
+.user-cnt-desc text{
+  position: absolute;
+  color: #916F11;
+  top: 2rem;
+  left: 2rem;
+}
+
+.recog-result {
+  position: absolute;
+  top: 500rpx;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 600rpx;
+  height: 250rpx;
+}
+
+.recog-result image{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.recog-result text {
+  position: absolute;
+  top: 4rem;
+  left: 1rem;
+  color: #916F11;
+}

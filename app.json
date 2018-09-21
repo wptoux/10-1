@@ -1,8 +1,5 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/logs/logs",
-    "pages/record/record",
     "pages/share/share"
   ],
   "window": {

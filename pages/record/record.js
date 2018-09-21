@@ -7,15 +7,23 @@ Page({
    * 页面的初始数据
    */
   data: {
-    hintImgSrc: "",
+    loginStatus: true,
+
+    backImgSrc: "../../assets/background.jpg",
+
+    shouldShowHint: false,
+    hintImgSrc: "../../assets/文案库背景.png",
     hintText: "",
 
+    barrageBackImgSrc: "../../assets/弹幕背景.png",
     barrageTextColor: "#D3D3D3",
     barrage_inputText: "none",
     barrage_shoottextColor: "black",
     bind_shootValue: "",
     barrage_style: [],
     barragefly_display: "none",
+
+    btnImgSrc: "../../assets/语音话筒.png",
   },
 
   /**
@@ -23,10 +31,6 @@ Page({
    */
   onLoad: function(options) {
     var that = this;
-
-    while(app.globalData.loginStatus === 0){
-      setTimeout(() => {}, 30)
-    }
 
     if (app.globalData.loginStatus === -1){
       return
@@ -83,6 +87,11 @@ Page({
   },
 
   onRecordPressed: function(e) {
+    this.setData({
+      shouldShowHint: true,
+      btnImgSrc: "../../assets/话筒按下.png"
+    })
+
     const options = {
       // duration: 10000,
       sampleRate: 16000,
@@ -111,10 +120,17 @@ Page({
     }, 100);
   },
   onRecordReleased: function(e) {
+    this.setData({
+      btnImgSrc: "../../assets/语音话筒.png"
+    })
     clearInterval(timer);
     wx.getRecorderManager().stop()
   },
   onRecordCancelled: function(e) {
+    this.setData({
+      btnImgSrc: "../../assets/语音话筒.png"
+    })
+
     clearInterval(timer);
     wx.getRecorderManager().stop()
   },
@@ -130,12 +146,12 @@ Page({
 
   shoot: function(text, avatarURI, voiceId) {
     //字体颜色随机
-    var textColor = "rgb(" + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + ")";
+    // var textColor = "rgb(" + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + ")";
     var top = (Math.random()) * this.data.phoneHeight * 0.65;
     var barrage_style_obj = {
       top: top,
       text: text,
-      color: textColor,
+      color: "#FFFFFF",
       left: (Math.random()) * this.data.phoneWidth,
       speed: Math.random() * 20 + 10,
       avatar: avatarURI,
@@ -167,18 +183,58 @@ Page({
           }
           else{
             that.setData({
-              hintImgSrc: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535798551&di=2ef16e231335625e1a51e898fc6cc612&imgtype=jpg&er=1&src=http%3A%2F%2Fwww.wallcoo.com%2Fcartoon%2FKitsunenoir_Design_Illustration_V%2Fwallpapers%2F2560x1440%2Fkim-holtermand-reflections.jpg",
               hintText: res.data.data.content
             })
           }
         }
         else {
           that.setData({
-            hintImgSrc: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535798551&di=2ef16e231335625e1a51e898fc6cc612&imgtype=jpg&er=1&src=http%3A%2F%2Fwww.wallcoo.com%2Fcartoon%2FKitsunenoir_Design_Illustration_V%2Fwallpapers%2F2560x1440%2Fkim-holtermand-reflections.jpg",
             hintText: "祖国您好~"
           })
         }
       }
     })
-  }
+  },
+
+  onGotUserInfo: function (e) {
+    var that = this;
+    console.info("User Info:")
+    console.log(e)
+    // 登录
+    wx.login({
+      success: res => {
+        console.info("WX Login status:")
+        console.info(res)
+
+        let params = e.detail.userInfo
+        params['wxCode'] = res.code
+
+        wx.request({
+          url: app.globalData.baseUrl + '/user/login',
+          data: params,
+          method: 'POST',
+          success: (resLogin) => {
+            console.info("Server Login status:")
+            console.info(resLogin)
+
+            if (resLogin.statusCode == 200 && resLogin.data.code == 1) {
+              app.globalData.cookie = resLogin.header['Set-Cookie']
+              app.globalData.loginStatus = 1
+              that.setData({
+                loginStatus: true
+              })
+            }
+            else {
+              console.warn('Server login failed...')
+              app.globalData.loginStatus = -1
+            }
+          },
+          fail: () => {
+            console.warn('Server login failed...')
+            app.globalData.loginStatus = -1
+          }
+        })
+      }
+    })
+  },
 })

@@ -1,9 +1,4 @@
 <!--index.wxml-->
-<view class="container">
-  <view class="front-page-image">
-    <image wx:if="{{isImageReady}}" src="{{imageSrc}}" style='width:480rpx;height: 300rpx'>
-    </image>
-  </view>
-  
-  <button class='btn-start' open-type='getUserInfo' bindgetuserinfo="onGotUserInfo">start</button>
-</view>
+<image class='page' src='{{backImage}}'/>
+
+<button class='btn-start' open-type='getUserInfo' bindgetuserinfo="onGotUserInfo">start</button>

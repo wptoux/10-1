@@ -5,7 +5,8 @@ const app = getApp()
 Page({
   data: {
     isImageReady: false,
-    imageSrc: ""
+    imageSrc: "",
+    backImage: "../../assets/background.jpg"
   },
 
   onGotUserInfo: function (e) {
