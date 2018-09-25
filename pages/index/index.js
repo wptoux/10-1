@@ -92,6 +92,8 @@ Page({
         console.info("WX Login status:")
         console.info(res)
 
+        app.globalData.userInfo = e.detail.userInfo
+
         let params = e.detail.userInfo
         params['wxCode'] = res.code
         
