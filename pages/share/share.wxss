@@ -13,7 +13,7 @@
   left: 0;
   right: 0;
   margin: auto;
-  width: 600rpx;
+  width: 450rpx;
   height: 300rpx;
   text-align: center;
   line-height: 120rpx;
@@ -23,19 +23,19 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: 600rpx;
-  height: 300rpx;
+  width: 100%;
+  height: 100%;
   z-index: -1;
 }
 
 .user-cnt-desc {
   position: absolute;
-  top: 350rpx;
+  top: 320rpx;
   left: 0;
   right: 0;
   margin: auto;
   width: 600rpx;
-  height: 200rpx;
+  height: 180rpx;
 }
 
 .avatar {
@@ -61,16 +61,17 @@
   color: #916F11;
   top: 2rem;
   left: 2rem;
+  margin-right: 1rem;
 }
 
 .recog-result {
   position: absolute;
-  top: 500rpx;
+  top: 450rpx;
   left: 0;
   right: 0;
   margin: auto;
   width: 600rpx;
-  height: 250rpx;
+  height: 10rem;
 }
 
 .recog-result image{
@@ -83,7 +84,8 @@
 
 .recog-result text {
   position: absolute;
-  top: 4rem;
-  left: 1rem;
+  top: 2rem;
+  left: 2rem;
+  margin-right: 1rem;
   color: #916F11;
 }

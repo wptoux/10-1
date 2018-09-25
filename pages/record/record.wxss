@@ -12,6 +12,7 @@
   width: 100%;
   position: absolute;
   top: 2rem;
+  display: block;
 }
 
 .barrage-fly-obj {

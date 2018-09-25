@@ -1,6 +1,7 @@
 // pages/record/record.js
-var timer;
-var app = getApp()
+const app = getApp()
+var recordeStatus = 0
+
 Page({
 
   /**
@@ -12,29 +13,27 @@ Page({
     backImgSrc: "../../assets/background.jpg",
 
     shouldShowHint: false,
-    hintImgSrc: "../../assets/文案库背景.png",
+    hintImgSrc: "../../assets/hint_back.png",
     hintText: "",
 
-    barrageBackImgSrc: "../../assets/弹幕背景.png",
-    barrageTextColor: "#D3D3D3",
-    barrage_inputText: "none",
-    barrage_shoottextColor: "black",
-    bind_shootValue: "",
-    barrage_style: [],
-    barragefly_display: "none",
+    barrageBackImgSrc: "../../assets/barrage_back.png",
+    barrageStyle: [],
+    barrageflyDisplay: "none",
 
-    btnImgSrc: "../../assets/语音话筒.png",
+    btnImgSrc: "../../assets/recorder.png",
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function(options) {
+  onLoad: function (options) {
     var that = this;
 
-    if (app.globalData.loginStatus === -1){
+    if (app.globalData.loginStatus === -1) {
       return
     }
+
+    this.getHint()
 
     //获取屏幕的宽度
     wx.getSystemInfo({
@@ -45,51 +44,26 @@ Page({
         })
       }
     })
-    this.openBarrage()
 
-    this.getHint()
-
-    //获取弹幕
-    let texts = null;
-
-    wx.request({
-      url: app.globalData.baseUrl + '/voice/list?page=0',
-      method: 'GET',
-      header: {
-        'cookie': app.globalData.cookie
-      },
-      success: function(res) {
-        console.info('Get list status:')
+    wx.getRecorderManager().onStop((res) => {
+      if (recordeStatus == 0) {
+        console.info('Record result:')
         console.info(res)
-        if (res.statusCode == 200 && res.data.code == 1 && res.data.data.length > 0) {
-          for (let d of res.data.data){
-            console.log(d)
-            that.shoot(d.greeting.content, d.user.avatarUrl, d.id)
-          }
-        } else {
-          texts = ["123", "234", "345", "456", "678", "789"]
-          for (let i = 0; i < texts.length; i++) {
-            that.shoot(texts[i], "")
-          }
-        }
+        let recordFilePath = res.tempFilePath
+        wx.navigateTo({
+          url: '../share/share?recordFilePath=' + encodeURIComponent(recordFilePath),
+        })
       }
     })
 
-    wx.getRecorderManager().onStop((res) => {
-      console.info('Record result:')
-      console.info(res)
-      let recordFilePath = res.tempFilePath
-      wx.navigateTo({
-        url: '../share/share?recordFilePath=' + encodeURIComponent(recordFilePath),
-      })
-
+    this.setData({
+      barrageStyle: app.globalData.barrageStatus
     })
   },
 
-  onRecordPressed: function(e) {
+  onRecordPressed: function (e) {
     this.setData({
-      shouldShowHint: true,
-      btnImgSrc: "../../assets/话筒按下.png"
+      btnImgSrc: "../../assets/recorder_down.png"
     })
 
     const options = {
@@ -101,71 +75,25 @@ Page({
       frameSize: 50
     }
     wx.getRecorderManager().start(options)
-
-    var barrage_style_arr = this.data.barrage_style;
-    var that = this;
-    timer = setInterval(function() {
-      for (var i = 0; i < barrage_style_arr.length; i++) {
-        barrage_style_arr[i].left += barrage_style_arr[i].speed;
-        if (barrage_style_arr[i].left > that.data.phoneWidth) {
-          barrage_style_arr[i].top = (Math.random()) * that.data.phoneHeight * 0.65;
-          barrage_style_arr[i].left = 0;
-          barrage_style_arr[i].speed = Math.random() * 20 + 10;
-        }
-      }
-      that.setData({
-        barrage_style: barrage_style_arr
-      })
-
-    }, 100);
+    recordeStatus = 1
   },
-  onRecordReleased: function(e) {
+  onRecordReleased: function (e) {
     this.setData({
-      btnImgSrc: "../../assets/语音话筒.png"
+      btnImgSrc: "../../assets/recorder.png"
     })
-    clearInterval(timer);
     wx.getRecorderManager().stop()
+    recordeStatus = 0
   },
-  onRecordCancelled: function(e) {
+  onRecordCancelled: function (e) {
     this.setData({
-      btnImgSrc: "../../assets/语音话筒.png"
+      btnImgSrc: "../../assets/recorder.png"
     })
 
-    clearInterval(timer);
     wx.getRecorderManager().stop()
+    recordeStatus = -1
   },
 
-  //是否打开弹幕... 
-  openBarrage: function() {
-    this.setData({
-      barrageTextColor: "#04BE02",
-      barrage_inputText: "flex",
-      barragefly_display: "block",
-    });
-  },
-
-  shoot: function(text, avatarURI, voiceId) {
-    //字体颜色随机
-    // var textColor = "rgb(" + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + ")";
-    var top = (Math.random()) * this.data.phoneHeight * 0.65;
-    var barrage_style_obj = {
-      top: top,
-      text: text,
-      color: "#FFFFFF",
-      left: (Math.random()) * this.data.phoneWidth,
-      speed: Math.random() * 20 + 10,
-      avatar: avatarURI,
-      voiceId: voiceId
-    };
-    var barrage_style_arr = this.data.barrage_style;
-    barrage_style_arr.push(barrage_style_obj);
-
-    this.setData({
-      barrage_style: barrage_style_arr
-    })
-  },
-
-  getHint: function(){
+  getHint: function () {
     var that = this
     //获取Hint
     wx.request({
@@ -178,63 +106,23 @@ Page({
         console.info('Get hint status:')
         console.info(res)
         if (res.statusCode == 200 && res.data.code == 1) {
-          if (res.data.data.content == that.data.hintText){
+          if (res.data.data.content == that.data.hintText) {
             that.getHint()
           }
-          else{
+          else {
             that.setData({
+              shouldShowHint: true,
               hintText: res.data.data.content
             })
           }
         }
         else {
           that.setData({
+            shouldShowHint: true,
             hintText: "祖国您好~"
           })
         }
       }
     })
-  },
-
-  onGotUserInfo: function (e) {
-    var that = this;
-    console.info("User Info:")
-    console.log(e)
-    // 登录
-    wx.login({
-      success: res => {
-        console.info("WX Login status:")
-        console.info(res)
-
-        let params = e.detail.userInfo
-        params['wxCode'] = res.code
-
-        wx.request({
-          url: app.globalData.baseUrl + '/user/login',
-          data: params,
-          method: 'POST',
-          success: (resLogin) => {
-            console.info("Server Login status:")
-            console.info(resLogin)
-
-            if (resLogin.statusCode == 200 && resLogin.data.code == 1) {
-              app.globalData.cookie = resLogin.header['Set-Cookie']
-              app.globalData.loginStatus = 1
-              that.setData({
-                loginStatus: true
-              })
-            }
-            else {
-              console.warn('Server login failed...')
-              app.globalData.loginStatus = -1
-            }
-          },
-          fail: () => {
-            console.warn('Server login failed...')
-            app.globalData.loginStatus = -1
-          }
-        })
-      }
-    })
-  },
+  }
 })

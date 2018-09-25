@@ -9,8 +9,8 @@ Page({
   data: {
     desc: "对不起，你在说什么",
     backImgSrc: "../../assets/background.jpg",
-    userCnt: '你是第8888位为祖国打call的人',
-    recogResult: "苟利国家生死以，岂因祸福避趋之"
+    userCnt: '我是第8888位为祖国打call的人',
+    recogResult: '“\n' + "  苟利国家生死以，岂因祸福避趋之"+ '\n            ”'
   },
 
   /**
@@ -18,38 +18,41 @@ Page({
    */
   onLoad: function(options) {
     let that = this
-    console.log(options)
+
+    return
     
     let recordFilePath = decodeURIComponent(options.recordFilePath)
 
-    if (recordFilePath.id) {
-      wx.uploadFile({
-        url: app.globalData.baseUrl + '/voice/recognize',
-        filePath: recordFilePath,
-        name: 'file',
-        header: {
-          'cookie': app.globalData.cookie
-        },
-        success: function(res) {
-          console.info('Recognize result:')
-          console.info(res)
+    wx.uploadFile({
+      url: app.globalData.baseUrl + '/voice/recognize',
+      filePath: recordFilePath,
+      name: 'file',
+      header: {
+        'cookie': app.globalData.cookie
+      },
+      success: function(res) {
+        console.info('Recognize result:')
+        console.info(res)
 
-          let s = ""
-          if (res.statusCode == 200) {
-            let rst = JSON.parse(res.data)
-            if (rst.code == 1) {
-              s = "识别成功！您说的是：" + rst.data.data
-            }
+        let s = ""
+        let sim = 0
+        let cnt = 0
+        if (res.statusCode == 200) {
+          let rst = JSON.parse(res.data)
+          if (rst.code == 1) {
+            s = rst.data.data
+            sim = rst.data.similarity
+            cnt = rst.data.count
+
+            that.setData({
+              desc: parseInt(sim * 100) + '%',
+              userCnt: '你是第' + cnt + '位为祖国打call的人',
+              recogResult: s
+            })
           }
-          if (s == "") {
-            s = "对不起，你在说什么？"
-          }
-          that.setData({
-            desc: s
-          })
         }
-      })
-    }
+      }
+    })
   },
 
 })

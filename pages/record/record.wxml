@@ -2,8 +2,8 @@
 <image class='page' src='{{backImgSrc}}'></image>
 
 <!--弹幕-->
-<view class="barrage-fly" style="display:{{barragefly_display}}">
-  <block wx:for="{{barrage_style}}" wx:key="unique">
+<view class="barrage-fly">
+  <block wx:for="{{barrageStyle}}" wx:key="unique">
     <view class="barrage-fly-obj" style="color:{{item.color}};left:{{item.left}}px;top:{{item.top}}px;">
       <view class="barrage-content">
         <image src="{{item.avatar}}"></image>
@@ -14,8 +14,7 @@
   </block>
 </view>
 
-
-<view class="record-hinter container" bindtap='getHint' wx:if="{{shouldShowHint}}">
+<view class="record-hinter container" bindtap='getHint' wx:if='{{shouldShowHint}}'>
   <text>{{hintText}}</text>
   <image src="{{hintImgSrc}}"></image>
 </view>

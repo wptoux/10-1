@@ -2,18 +2,18 @@
 <image class='page' src='{{backImgSrc}}'></image>
 
 <view class='sim-desc'>
-  <image src='../../assets/相似度背景.png'/>
+  <image src='../../assets/sim_txt_back.png'/>
   <text>{{desc}}</text>
 </view>
 
 <view class='user-cnt-desc'>
   <image class='avatar' src='{{avatar}}'/>
-  <image class='badge' src='../../assets/勋章.png'/>
-  <image class='user-cnt-desc-back' src='../../assets/你是第xxx打call的人背景图.png'/>
+  <image class='badge' src='../../assets/badge.png'/>
+  <image class='user-cnt-desc-back' src='../../assets/you_re_the_xxxth.png'/>
   <text>{{userCnt}}</text>
 </view>
 
 <view class='recog-result'>
-  <image src='../../assets/识别结果背景图.png'/>
-  <text>{{recogResult}}</text>
+  <image src='../../assets/recog_result_back.png'/>
+  <text space='emsp'>{{recogResult}}</text>
 </view>
