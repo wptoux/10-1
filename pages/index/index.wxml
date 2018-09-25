@@ -1,9 +1,17 @@
 <!--index.wxml-->
-<view class="container">
-  <view class="front-page-image">
-    <image wx:if="{{isImageReady}}" src="{{imageSrc}}" style='width:480rpx;height: 300rpx'>
-    </image>
-  </view>
-  
-  <button class='btn-start' open-type='getUserInfo' bindgetuserinfo="onGotUserInfo">start</button>
+<image class='page' src='{{backImage}}'/>
+
+<!--弹幕-->
+<view class="barrage-fly">
+  <block wx:for="{{barrageStyle}}" wx:key="unique">
+    <view class="barrage-fly-obj" style="color:{{item.color}};left:{{item.left}}px;top:{{item.top}}px;">
+      <view class="barrage-content">
+        <image src="{{item.avatar}}"></image>
+        <text>{{item.text}}</text>
+      </view>
+      <image class='barrage-back' src="{{barrageBackImgSrc}}" />
+    </view>
+  </block>
 </view>
+
+<button class='btn-start' open-type='getUserInfo' bindgetuserinfo="onGotUserInfo">start</button>

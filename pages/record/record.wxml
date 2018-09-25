@@ -1,18 +1,25 @@
 <!--pages/record/record.wxml-->
+<image class='page' src='{{backImgSrc}}'></image>
+
 <!--弹幕-->
-<view class="barrage-fly" style="display:{{barragefly_display}}">
-  <block wx:for="{{barrage_style}}" wx:key="unique">
+<view class="barrage-fly">
+  <block wx:for="{{barrageStyle}}" wx:key="unique">
     <view class="barrage-fly-obj" style="color:{{item.color}};left:{{item.left}}px;top:{{item.top}}px;">
-      <image src="{{item.avatar}}"></image>
-      <text>{{item.text}}</text>
+      <view class="barrage-content">
+        <image src="{{item.avatar}}"></image>
+        <text>{{item.text}}</text>
+      </view>
+      <image class='barrage-back' src="{{barrageBackImgSrc}}" />
     </view>
   </block>
 </view>
 
-
-<view class="record-hinter" bindtap='getHint'>
+<view class="record-hinter container" bindtap='getHint' wx:if='{{shouldShowHint}}'>
   <text>{{hintText}}</text>
   <image src="{{hintImgSrc}}"></image>
 </view>
 
-<image class='record-btn' src='record-btn.jpg' bindtouchstart='onRecordPressed' bindtouchend='onRecordReleased' bindtouchcancel='onRecordCancelled'></image>
+<image class='record-btn' wx:if="{{loginStatus}}" src='{{btnImgSrc}}' bindtouchstart='onRecordPressed' bindtouchend='onRecordReleased' bindtouchcancel='onRecordCancelled' />
+
+<!-- <view class='mask' wx:if="{{!loginStatus}}"></view>
+<button class='btn-start' wx:if="{{!loginStatus}}" open-type='getUserInfo' bindgetuserinfo="onGotUserInfo">start</button> -->

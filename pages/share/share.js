@@ -7,15 +7,20 @@ Page({
    * 页面的初始数据
    */
   data: {
-    desc: ""
+    desc: "对不起，你在说什么",
+    backImgSrc: "../../assets/background.jpg",
+    userCnt: '我是第8888位为祖国打call的人',
+    recogResult: '“\n' + "  苟利国家生死以，岂因祸福避趋之"+ '\n            ”'
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  onLoad: function(options) {
     let that = this
-    console.log(options)
+
+    return
+    
     let recordFilePath = decodeURIComponent(options.recordFilePath)
 
     wx.uploadFile({
@@ -25,23 +30,27 @@ Page({
       header: {
         'cookie': app.globalData.cookie
       },
-      success: function (res) {
+      success: function(res) {
         console.info('Recognize result:')
         console.info(res)
 
         let s = ""
+        let sim = 0
+        let cnt = 0
         if (res.statusCode == 200) {
           let rst = JSON.parse(res.data)
-          if (rst.code == 1){
-            s = "识别成功！您说的是：" + rst.data.data
+          if (rst.code == 1) {
+            s = rst.data.data
+            sim = rst.data.similarity
+            cnt = rst.data.count
+
+            that.setData({
+              desc: parseInt(sim * 100) + '%',
+              userCnt: '你是第' + cnt + '位为祖国打call的人',
+              recogResult: s
+            })
           }
         }
-        if (s == ""){
-          s = "对不起，你在说什么？"
-        }
-        that.setData({
-          desc: s
-        })
       }
     })
   },
