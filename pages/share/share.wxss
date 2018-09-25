@@ -40,20 +40,27 @@
 
 .avatar {
   position: absolute;
+  top: -30rpx;
+  left: -30rpx;
+  width: 100rpx;
+  height: 100rpx;
 }
 
 .badge {
   position: absolute;
-  
+  top: 30rpx;
+  left: 30rpx;
   width: 75rpx;
   height: 75rpx;
 }
 
 .user-cnt-desc-back {
   position: absolute;
-  width: 100%;
+  left: 30rpx;
+  width: 570rpx;
   height: 100%;
   top: 0;
+  z-index: -1;
 }
 
 .user-cnt-desc text{
@@ -85,7 +92,7 @@
 
 .recog-result text {
   position: absolute;
-  top: 2rem;
+  top: 4rem;
   left: 2rem;
   margin-right: 1rem;
   color: #916F11;
