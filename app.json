@@ -1,9 +1,8 @@
 {
   "pages": [
-    "pages/share/share",
     "pages/index/index",
-    "pages/record/record"
-    
+    "pages/record/record",
+    "pages/share/share"
   ],
   "window": {
     "backgroundTextStyle": "light",
