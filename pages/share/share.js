@@ -7,9 +7,9 @@ Page({
    * 页面的初始数据
    */
   data: {
-    desc: "对不起，你在说什么",
+    desc: "对不起，你在说什么?",
     backImgSrc: "../../assets/background.jpg",
-    userCnt: ' 我是第8888位为祖国打call的人',
+    userCnt: '',
     recogResult: "苟利国家生死以，岂因祸福避趋之",
   },
 
@@ -33,7 +33,7 @@ Page({
 
       that.setData({
         desc: parseInt(sim * 100) + '%',
-        userCnt: '我是第' + cnt + '位为祖国打call的人',
+        userCnt: ' 我是第' + cnt + '位为祖国打call的人',
         recogResult: s
       })
     }

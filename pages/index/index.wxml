@@ -16,4 +16,6 @@
 
 <canvas canvas-id="canvas" class="canvas"></canvas>
 
-<button class='btn-start' open-type='getUserInfo' bindgetuserinfo="onGotUserInfo">start</button>
+<button class='btn-start' open-type='getUserInfo' bindgetuserinfo="onGotUserInfo">
+  <image src='{{btnImgSrc}}'></image>
+</button>

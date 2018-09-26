@@ -13,6 +13,8 @@ Page({
 
     barrageBackImgSrc: "../../assets/barrage_back.png",
     barrageflyDisplay: "none",
+
+    btnImgSrc: "../../assets/start_btn.png"
   },
 
   onLoad: function () {
@@ -34,6 +36,10 @@ Page({
       barrageStyle = []
     }
 
+    this.setData({
+      btnImgSrc: "../../assets/start_btn.png"
+    })
+
     var that = this
     //获取弹幕
     wx.request({
@@ -49,10 +55,10 @@ Page({
           let arr = that.shuffle(res.data.data).slice(0, 15)
           for (let d of res.data.data) {
             console.log(d)
-            if (d.originalRecognizedString == ''){
+            if (d.originalRecognizedString == '') {
               that.shoot(d.greeting.content, d.user.avatarUrl, d.id)
             }
-            else{
+            else {
               that.shoot(d.originalRecognizedString, d.user.avatarUrl, d.id)
             }
           }
@@ -86,6 +92,10 @@ Page({
 
   onGotUserInfo: function (e) {
     clearInterval(timer)
+
+    this.setData({
+      btnImgSrc: '../../assets/start_btn_down.png'
+    })
 
     var that = this
     console.info("User Info:")
@@ -132,12 +142,12 @@ Page({
     })
   },
 
-  drawBarrage: function(barrageStyle) {
+  drawBarrage: function (barrageStyle) {
     let c = wx.createCanvasContext('canvas', this)
     let px = this.data.phoneWidth / 750
     let rem = this.data.phoneWidth / 20
 
-    function _drawItem(x, y, avatar, text){
+    function _drawItem(x, y, avatar, text) {
       /*
       .barrage-fly-obj {
         position: absolute;
@@ -180,7 +190,7 @@ Page({
         z-index: -1;
       }
       */
-      
+
       c.drawImage("../../assets/barrage_back.png", x, y, 12.5 * rem, 2.5 * rem)
       c.drawImage(avatar, x + 2.1 * rem, y + 1.25 * rem, rem, rem)
       c.setFontSize(0.8 * rem)
@@ -189,7 +199,7 @@ Page({
       c.fillText(text, x + 3.5 * rem, y + 2 * rem, 8 * rem)
     }
 
-    for (let i = 0; i < barrageStyle.length; i++){
+    for (let i = 0; i < barrageStyle.length; i++) {
       _drawItem(barrageStyle[i].left, barrageStyle[i].top, barrageStyle[i].avatar, barrageStyle[i].text)
     }
 
@@ -229,6 +239,18 @@ Page({
 
     barrageStyle.push(barrageStyleObj);
   },
+
+  // onTouch: function() {
+  //   this.setData({
+  //     btnImgSrc: '../../assets/start_btn_down.png'
+  //   })  
+  // },
+
+  // onTouchEnd: function () {
+  //   this.setData({
+  //     btnImgSrc: "../../assets/start_btn.png"
+  //   }) 
+  // },
   /**
    * Shuffles array in place.
    * @param {Array} a items An array containing the items.

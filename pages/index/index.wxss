@@ -1,4 +1,5 @@
 /**index.wxss**/
+
 .page {
   position: absolute;
   width: 100%;
@@ -6,16 +7,25 @@
   z-index: -1;
 }
 
-.btn-start{
+.btn-start {
   position: absolute;
-  bottom: 150rpx;
-  width: 150rpx;
+  bottom: 100rpx;
+  width: 300rpx;
+  height: 100rpx;
   left: 0;
   right: 0;
   margin: auto;
+  padding: 0;
+  background-color: transparent;
+}
+
+.btn-start image {
+  width: 100%;
+  height: 100%;
 }
 
 /*弹幕飞飞飞*/
+
 .canvas {
   height: 70%;
   width: 100%;
@@ -31,7 +41,6 @@
   top: 2rem;
   display: block;
 } */
-
 
 /* 
 .barrage-fly-obj {
