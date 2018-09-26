@@ -63,16 +63,16 @@ Page({
             console.info(res)
             if (res.statusCode == 200) {
               wx.navigateTo({
-                url: '../share/share?result=' + encodeURIComponent(res),
+                url: '../share/share?result=' + encodeURIComponent(res.data),
               })
             }
             else{
-              wx.navigateTo({
-                url: '../share/share?result=' + encodeURIComponent('{"code":0}'),
+              wx.showToast({
+                title: '正确率不足~',
               })
             }
           },
-          fail: () =>{
+          fail: (res) =>{
             wx.navigateTo({
               url: '../share/share?result=' + encodeURIComponent('{"code":0}'),
             })
