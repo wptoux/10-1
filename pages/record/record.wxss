@@ -7,7 +7,7 @@
 }
 
 /*弹幕飞飞飞*/
-.barrage-fly {
+.canvas {
   height: 70%;
   width: 100%;
   position: absolute;
@@ -15,6 +15,16 @@
   display: block;
 }
 
+/* .barrage-fly {
+  height: 70%;
+  width: 100%;
+  position: absolute;
+  top: 2rem;
+  display: block;
+} */
+
+
+/* 
 .barrage-fly-obj {
   position: absolute;
   width: 12.5rem;
@@ -42,7 +52,9 @@
   position: absolute;
   top: 0;
   left: 1rem;
+  width: 8rem;
   font-size: 0.8rem;
+  text-align: right;
 }
 
 .barrage-back {
@@ -52,7 +64,7 @@
   width: 100%;
   height: 100%;
   z-index: -1;
-}
+} */
 
 .record-hinter {
   position: absolute;
@@ -60,10 +72,10 @@
   right: 0;
   margin: auto;
   width: 18rem;
-  height: 25rem;
+  height: 21rem;
   line-height: 1.5rem;
   text-align: center;
-  bottom: 210rpx;
+  top: 100rpx;
   z-index: 10;
 }
 
@@ -87,36 +99,9 @@
   left: 0;
   right: 0;
   margin: auto;
-  bottom: 50rpx;
-  width: 200rpx;
-  height: 200rpx;
+  bottom: 10rpx;
+  width: 300rpx;
+  height: 300rpx;
   border: none;
   padding: 0;
 }
-
-/* .mask {
-  position: absolute;
-  top:0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  width: 95%;
-  height: 95%;
-  background-color: darkgray;
-  opacity: 0.1;
-  box-shadow: 10rpx 10rpx 5rpx 0;
-  z-index: 3;
-}
-
-.btn-start{
-  position: absolute;
-  bottom: 50rpx;
-  width: 150rpx;
-  height: 150rpx;
-  line-height: 150rpx;
-  left: 0;
-  right: 0;
-  margin: auto;
-  z-index: 4;
-} */

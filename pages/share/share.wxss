@@ -35,7 +35,7 @@
   right: 0;
   margin: auto;
   width: 600rpx;
-  height: 180rpx;
+  height: 5rem;
 }
 
 .avatar {
@@ -66,11 +66,18 @@
 .user-cnt-desc text{
   position: absolute;
   color: #916F11;
-  top: 2rem;
+  top: 1.2rem;
   left: 2rem;
   margin-right: 1rem;
   z-index: 1;
 }
+
+/* .user-cnt-desc text {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  color: #916F11;
+} */
 
 .recog-result {
   position: absolute;
@@ -96,5 +103,6 @@
   left: 2rem;
   margin-right: 1rem;
   color: #916F11;
+  text-align: center;
   z-index: 1;
 }

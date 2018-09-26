@@ -2,7 +2,7 @@
 <image class='page' src='{{backImgSrc}}'></image>
 
 <!--弹幕-->
-<view class="barrage-fly">
+<!-- <view class="barrage-fly">
   <block wx:for="{{barrageStyle}}" wx:key="unique">
     <view class="barrage-fly-obj" style="color:{{item.color}};left:{{item.left}}px;top:{{item.top}}px;">
       <view class="barrage-content">
@@ -12,7 +12,9 @@
       <image class='barrage-back' src="{{barrageBackImgSrc}}" />
     </view>
   </block>
-</view>
+</view> -->
+
+<canvas canvas-id="canvas" class="canvas"></canvas>
 
 <view class="record-hinter container" bindtap='getHint' wx:if='{{shouldShowHint}}'>
   <text>{{hintText}}</text>
