@@ -10,7 +10,7 @@
   <image class='avatar' src='{{avatar}}'/>
   <image class='badge' src='../../assets/badge.png'/>
   <image class='user-cnt-desc-back' src='../../assets/you_re_the_xxxth.png'/>
-  <text>{{userCnt}}</text>
+  <text space='emsp'>{{userCnt}}</text>
 </view>
 
 <view class='recog-result'>
