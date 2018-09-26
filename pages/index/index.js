@@ -53,28 +53,30 @@ Page({
         console.info(res)
         if (res.statusCode == 200 && res.data.code == 1 && res.data.data.length > 0) {
           let arr = that.shuffle(res.data.data).slice(0, 15)
+          let idx = 0
           for (let d of res.data.data) {
-            console.log(d)
             if (d.originalRecognizedString == '') {
-              that.shoot(d.greeting.content, d.user.avatarUrl, d.id)
+              that.shoot(d.greeting.content, d.user.avatarUrl, d.id, idx)
             }
             else {
-              that.shoot(d.originalRecognizedString, d.user.avatarUrl, d.id)
+              that.shoot(d.originalRecognizedString, d.user.avatarUrl, d.id, idx)
             }
+            idx += 1
           }
         } else {
           let texts = ["123", "234", "345", "456", "678", "一二三四五六七八九十一二三四"]
           for (let i = 0; i < texts.length; i++) {
-            that.shoot(texts[i], "", "")
+            that.shoot(texts[i], "", "", i)
           }
         }
 
         timer = setInterval(function () {
+          let rem = that.data.phoneWidth / 20
           for (var i = 0; i < barrageStyle.length; i++) {
             barrageStyle[i].left += barrageStyle[i].speed
 
             if (barrageStyle[i].left > that.data.phoneWidth) {
-              barrageStyle[i].top = (Math.random()) * that.data.phoneHeight * 0.65
+              barrageStyle[i].top = parseInt(Math.random() * 15) * rem * 1.2
               barrageStyle[i].left = 0
               barrageStyle[i].speed = Math.random() * 2 + 2
             }
@@ -213,31 +215,47 @@ Page({
     });
   },
 
-  shoot: function (text, avatarURI, voiceId) {
+  shoot: function (text, avatarURI, voiceId, idx) {
     if (text.length > 10) {
       {
         text = text.slice(0, 9) + "..."
       }
     }
+    var that = this
 
-    //字体颜色随机
-    // var textColor = "rgb(" + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + ")";
-    var top = (Math.random()) * this.data.phoneHeight * 0.65;
-    var barrageStyleObj = {
-      top: top,
-      left: (Math.random()) * this.data.phoneWidth * 0.5,
-      text: text,
-      speed: Math.random() * 2 + 2,
-      color: "#FFFFFF",
-      avatar: avatarURI,
-      voiceId: voiceId,
-      animationObj: wx.createAnimation({
-        duration: 1000
-      }),
-      animationData: {}
-    };
+    function _shoot(avatar) {
+      //字体颜色随机
+      // var textColor = "rgb(" + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + ")";
+      let rem = that.data.phoneWidth / 20
+      var top = idx * rem * 1.2
+      var barrageStyleObj = {
+        top: top,
+        left: (Math.random()) * that.data.phoneWidth * 0.5,
+        text: text,
+        speed: Math.random() * 2 + 2,
+        color: "#FFFFFF",
+        avatar: avatar,
+        voiceId: voiceId,
+        animationObj: wx.createAnimation({
+          duration: 1000
+        }),
+        animationData: {}
+      };
 
-    barrageStyle.push(barrageStyleObj);
+      barrageStyle.push(barrageStyleObj)
+    }
+
+    if (avatarURI != ''){
+      wx.getImageInfo({
+        src: avatarURI,
+        success: (res) => {
+          _shoot(res.path)
+        }
+      })
+    }
+    else{
+      _shoot('')
+    }
   },
 
   // onTouch: function() {

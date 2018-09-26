@@ -31,7 +31,7 @@ Page({
       sim = rst.data.similarity
       cnt = rst.data.count
 
-      that.setData({
+      this.setData({
         desc: parseInt(sim * 100) + '%',
         userCnt: ' 我是第' + cnt + '位为祖国打call的人',
         recogResult: s
