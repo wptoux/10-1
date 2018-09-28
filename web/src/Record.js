@@ -35,13 +35,13 @@ class Record extends Component {
       url: global.constants.baseUrl + '/common/sign',
       method: 'Post',
       data: {
-        url: global.constants.baseUrl + '/record'
+        url: window.location.href.split('#')[0]
       },
       success: (res) => {
         console.info('Get signature')
         console.info(res)
 
-        if (res.code == 1){
+        if (res.code == 1) {
           wx.config({
             debug: false,
             appId: res.data.appId,
@@ -49,14 +49,36 @@ class Record extends Component {
             nonceStr: res.data.nonceStr,
             signature: res.data.signature,
             jsApiList: [
-              'startRecord','stopRecord','onVoiceRecordEnd',
-              'playVoice','stopVoice','onVoicePlayEnd','uploadVoice'
+              'startRecord', 'stopRecord', 'onVoiceRecordEnd',
+              'playVoice', 'stopVoice', 'onVoicePlayEnd', 'uploadVoice'
             ]
           })
 
           wx.ready(() => {
             that.setState({
               wxReady: true
+            })
+
+            wx.onVoiceRecordEnd({
+              complete: (res) => {
+                console.info('voice recorded')
+                console.info(res)
+                wx.translateVoice({
+                  localId: res.localId,
+                  isShowProgressTips: 1,
+                  success: (res) => {
+                    console.info('voice recognized')
+                    console.info(res)
+                  }
+                })
+              }
+            })
+          })
+
+          wx.error((res) => {
+            console.log(res)
+            that.setState({
+              wxReady: false
             })
           })
         }
@@ -98,12 +120,15 @@ class Record extends Component {
     })
   }
 
+  //todo: prevent press event. add cancel event.
   onRecorderDown() {
     this.setState({
       recordBtnSrc: recordBtnDownImg
     })
 
-    wx.startRecord()
+    if (this.state.wxReady) {
+      wx.startRecord()
+    }
   }
 
   onRecorderUp() {
@@ -117,11 +142,14 @@ class Record extends Component {
         name: this.props.location.state.name
       }
     })
-    wx.stopRecord()
+
+    if (this.state.wxReady) {
+      wx.stopRecord()
+    }
   }
 
   render() {
-    if (this.state.redirectTo){
+    if (this.state.redirectTo) {
       return (<Redirect push to={{
         pathname: this.state.redirectTo,
         state: this.state.redirectParams
@@ -138,8 +166,9 @@ class Record extends Component {
         </div>
 
         <img className='record-btn' src={this.state.recordBtnSrc}
-          onMouseDown={this.onRecorderDown} onMouseUp={this.onRecorderUp} 
-          onTouchStart={this.onRecorderDown} onTouchEnd={this.onRecorderUp}/>
+          onMouseDown={this.onRecorderDown} onMouseUp={this.onRecorderUp}
+          onTouchStart={this.onRecorderDown} onTouchEnd={this.onRecorderUp} 
+          onTouchCancel={this.onRecorderUp}/>
       </div>)
   }
 }

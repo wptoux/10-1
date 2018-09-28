@@ -94,14 +94,14 @@
 
 .sim-desc {
   position: absolute;
-  top: 4rem;
+  top: 10%;
   left: 0;
   right: 0;
   margin: auto;
-  width: 15rem;
-  height: 10rem;
+  width: 55%;
+  height: 6rem;
   text-align: center;
-  line-height: 4rem;
+  line-height: 2rem;
 }
 
 .sim-desc img{
@@ -115,11 +115,11 @@
 
 .user-cnt-desc {
   position: absolute;
-  top: 10rem;
+  top: 8rem;
   left: 0;
   right: 0;
   margin: auto;
-  width: 20rem;
+  width: 90%;
   height: 5rem;
 }
 
@@ -171,11 +171,11 @@
 
 .recog-result {
   position: absolute;
-  top: 15rem;
+  top: 12.5rem;
   left: 0;
   right: 0;
   margin: auto;
-  width: 20rem;
+  width: 80%;
   height: 10rem;
 }
 
