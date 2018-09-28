@@ -18,4 +18,4 @@
   <text space='emsp'>{{recogResult}}</text>
 </view>
 
-<image class='qrcode' src="../../assets/qrcode.jpg"/>
+<!-- <image class='qrcode' src="../../assets/qrcode.jpg"/> -->

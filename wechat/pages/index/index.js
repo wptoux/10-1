@@ -150,55 +150,12 @@ Page({
     let rem = this.data.phoneWidth / 20
 
     function _drawItem(x, y, avatar, text) {
-      /*
-      .barrage-fly-obj {
-        position: absolute;
-        width: 12.5rem;
-        height: 2.5rem;
-        overflow: hidden;
-      }
-
-      .barrage-content {
-        position: absolute;
-        top: 1.25rem;
-        left: 2.1rem;
-        width: 9rem;
-        height: 1.5rem;
-      }
-
-      .barrage-content image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 1rem;
-        height: 1rem;
-      }
-
-      .barrage-content text {
-        position: absolute;
-        top: 0;
-        left: 1rem;
-        width: 8rem;
-        font-size: 0.8rem;
-        text-align: right;
-      }
-
-      .barrage-back {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-      }
-      */
-
-      c.drawImage("../../assets/barrage_back.png", x, y, 12.5 * rem, 2.5 * rem)
-      c.drawImage(avatar, x + 2.1 * rem, y + 1.25 * rem, rem, rem)
+      c.drawImage("../../assets/barrage_back.png", x, y, 10 * rem, 1.5 * rem)
+      // c.drawImage(avatar, x + 2.1 * rem, y + 1.25 * rem, rem, rem)
       c.setFontSize(0.8 * rem)
       c.setFillStyle("#FFFFFF")
       c.setTextAlign('left')
-      c.fillText(text, x + 3.5 * rem, y + 2 * rem, 8 * rem)
+      c.fillText(text, x + 1 * rem, y + 1 * rem, 8 * rem)
     }
 
     for (let i = 0; i < barrageStyle.length; i++) {
