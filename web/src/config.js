@@ -1,3 +1,3 @@
 global.constants = {
-    baseUrl: "https://kaixinabc.net/party"
+    baseUrl: "https://kaixinabc.net/partytest"
 };

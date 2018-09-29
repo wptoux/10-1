@@ -27,9 +27,12 @@ class Record extends Component {
     this.onHinterClick = this.refreshHinter.bind(this)
     this.onRecorderDown = this.onRecorderDown.bind(this)
     this.onRecorderUp = this.onRecorderUp.bind(this)
+    this.onRecorderCancel = this.onRecorderCancel.bind(this)
     this.state = {
       recordBtnSrc: recordBtnImg
     }
+
+    this.recordStatus = 0
 
     $.ajax({
       url: global.constants.baseUrl + '/common/sign',
@@ -50,7 +53,8 @@ class Record extends Component {
             signature: res.data.signature,
             jsApiList: [
               'startRecord', 'stopRecord', 'onVoiceRecordEnd',
-              'playVoice', 'stopVoice', 'onVoicePlayEnd', 'uploadVoice'
+              'playVoice', 'stopVoice', 'onVoicePlayEnd', 'uploadVoice',
+              'translateVoice'
             ]
           })
 
@@ -61,16 +65,6 @@ class Record extends Component {
 
             wx.onVoiceRecordEnd({
               complete: (res) => {
-                console.info('voice recorded')
-                console.info(res)
-                wx.translateVoice({
-                  localId: res.localId,
-                  isShowProgressTips: 1,
-                  success: (res) => {
-                    console.info('voice recognized')
-                    console.info(res)
-                  }
-                })
               }
             })
           })
@@ -115,37 +109,117 @@ class Record extends Component {
         }
       },
       error: (res) => {
-
+        that.setState({
+          hintText: "祖国您好~"
+        })
       }
     })
   }
 
   //todo: prevent press event. add cancel event.
-  onRecorderDown() {
+  onRecorderDown(e) {
+    e = e || window.event;
+    e.preventDefault && e.preventDefault();
+    e.stopPropagation && e.stopPropagation();
+    e.cancelBubble = true;
+
     this.setState({
       recordBtnSrc: recordBtnDownImg
     })
+
+    this.recordStartTime = new Date().getTime()
 
     if (this.state.wxReady) {
       wx.startRecord()
     }
   }
 
-  onRecorderUp() {
+  onRecorderUp(e) {
+    let that = this
+
+    e = e || window.event;
+    e.preventDefault && e.preventDefault();
+    e.stopPropagation && e.stopPropagation();
+    e.cancelBubble = true;
+
     this.setState({
       recordBtnSrc: recordBtnImg,
-      redirectTo: '/share',
-      redirectParams: {
-        accuracy: '100%',
-        userCnt: 8888,
-        recogResult: this.state.hintText,
-        name: this.props.location.state.name
+    })
+
+    let endTime = new Date().getTime()
+
+    if ((endTime - this.recordStartTime) / 1000 > 1) {
+      if (this.state.wxReady) {
+        wx.stopRecord({
+          success: (res) => {
+            console.info('voice recorded')
+            console.info(res)
+
+            wx.uploadVoice({
+              localId: res.localId,
+              success: (res) => {
+                alert(res.serverId)
+              }
+            })
+            let voiceId = res.localId
+
+            wx.translateVoice({
+              localId: res.localId,
+              isShowProgressTips: 1,
+              success: (res) => {
+                console.info('voice recognized')
+                console.info(res)
+
+                if (res.translateResult && res.translateResult != ''){
+                  let a = this.state.hintText
+                  let b = res.translateResult
+
+                  this.setState({
+                      redirectTo: '/share',
+                      redirectParams: {
+                        accuracy: parseInt(this.calcAcc(a, b) * 100) + '%',
+                        userCnt: parseInt(Math.random() * 10000),
+                        recogResult: b,
+                        voiceId: voiceId,
+                        name: this.props.location.state.name
+                      }
+                    })
+                }
+              }
+            })
+          }
+        })
       }
+    }
+  }
+
+  onRecorderCancel(e) {
+    e = e || window.event;
+    e.preventDefault && e.preventDefault();
+    e.stopPropagation && e.stopPropagation();
+    e.cancelBubble = true;
+
+    this.setState({
+      recordBtnSrc: recordBtnImg
     })
 
     if (this.state.wxReady) {
       wx.stopRecord()
     }
+  }
+
+  calcAcc(str, baseStr){
+    let n = Math.min(str.length, baseStr.length)
+    let i = 0
+    for (; i < n; i++){
+      if (str[i] != baseStr[i]){
+        break
+      }
+    }
+
+    let acc = i / baseStr.length
+
+    return acc
   }
 
   render() {
@@ -161,14 +235,18 @@ class Record extends Component {
         <img className='page' src={backImg} />
         <img className='canvas' src={this.props.location.state.barrageStatus} />
         <div className='record-hinter container' onClick={this.onHinterClick}>
+          <div className='you-may-say'>你可以说:</div>
           <div className='hint-text'>{this.state.hintText}</div>
           <img src={hintImg}></img>
         </div>
 
-        <img className='record-btn' src={this.state.recordBtnSrc}
-          onMouseDown={this.onRecorderDown} onMouseUp={this.onRecorderUp}
-          onTouchStart={this.onRecorderDown} onTouchEnd={this.onRecorderUp} 
-          onTouchCancel={this.onRecorderUp}/>
+        <button className='record-btn' onMouseDown={this.onRecorderDown} onMouseUp={this.onRecorderUp}
+          onTouchStart={this.onRecorderDown} onTouchEnd={this.onRecorderUp}
+          onTouchCancel={this.onRecorderCancel} >
+          <img src={this.state.recordBtnSrc} />
+          <div className='long-press-to-speak'>长按录音</div>
+        </button>
+
       </div>)
   }
 }

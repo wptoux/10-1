@@ -27,6 +27,7 @@ class App extends Component {
     super(props);
     this.onStartClick = this.onStartClick.bind(this)
     this.onNameClick = this.onNameClick.bind(this)
+    this.onCanvasClick = this.onCanvasClick.bind(this)
 
     this.state = {
       btnImgSrc: btnImg
@@ -73,10 +74,10 @@ class App extends Component {
           let idx = 0
           for (let d of res.data) {
             if (d.originalRecognizedString == '') {
-              that.shoot(d.greeting.content, d.user.avatarUrl, d.id, idx)
+              that.shoot(d.greeting.content, d, idx)
             }
             else {
-              that.shoot(d.originalRecognizedString, d.user.avatarUrl, d.id, idx)
+              that.shoot(d.originalRecognizedString, d, idx)
             }
             idx += 1
           }
@@ -127,7 +128,7 @@ class App extends Component {
   }
 
   onNameClick() {
-    if (this.state.nameInput.value == '你的名字'){
+    if (this.state.nameInput.value == '你的名字') {
       this.state.nameInput.value = ''
     }
   }
@@ -154,9 +155,64 @@ class App extends Component {
         }
 
         that.drawBarrage(barrageStyle)
+        that.processBarrageEvent()
+        
       }, 30);
     }
 
+  }
+
+  processBarrageEvent() {
+    if (this.canvasClickEvent){
+      let rem = this.state.phoneWidth / 20
+      let w = 10 * rem
+      let h = 1.5 * rem
+  
+      let x = this.canvasClickEvent.x
+      let y = this.canvasClickEvent.y
+  
+      for (let i = 0; i < barrageStyle.length; i++) {
+        let b = barrageStyle[i]
+  
+        if (b.left < x && b.left + w > x && b.top < y && b.top + h > y) {
+          let name = ''
+          let acc = 1
+          let content = ''
+          let userCnt = parseInt(Math.random() * 10000)
+  
+          if (b.detail) {
+            acc = b.detail.similarity
+  
+            if (b.detail.user) {
+              name = b.detail.user.nickName
+              userCnt = b.detail.user.id
+            }
+          }
+
+          if (b.detail.originalRecognizedString == '') {
+            content = b.detail.greeting.content
+          }
+          else {
+            content = b.detail.originalRecognizedString
+          }
+          
+          clearInterval(timer)
+          this.setState({
+            redirectTo: '/share',
+            redirectParams: {
+              accuracy: parseInt(acc * 100) + '%',
+              userCnt: userCnt,
+              recogResult: content,
+              fromBarrage: true,
+              voiceId: b.detail.id,
+              name: name
+            }
+          })
+          break
+        }
+      }
+      this.canvasClickEvent = null
+    }
   }
 
   drawBarrage(barrageStyle) {
@@ -180,7 +236,17 @@ class App extends Component {
     }
   }
 
-  shoot(text, avatarURI, voiceId, idx) {
+  onCanvasClick(e) {
+    let x = e.nativeEvent.offsetX
+    let y = e.nativeEvent.offsetY
+
+    this.canvasClickEvent = {
+      x: x,
+      y: y
+    }
+  }
+
+  shoot(text, detail, idx) {
     if (text.length > 10) {
       text = text.slice(0, 9) + "..."
     }
@@ -197,8 +263,7 @@ class App extends Component {
         text: text,
         speed: Math.random() * 2 + 2,
         color: "#FFFFFF",
-        avatar: avatar,
-        voiceId: voiceId,
+        detail: detail
       };
 
       barrageStyle.push(barrageStyleObj)
@@ -237,7 +302,7 @@ class App extends Component {
 
   render() {
     var that = this
-    if (this.state.redirectTo){
+    if (this.state.redirectTo) {
       return (<Redirect push to={{
         pathname: this.state.redirectTo,
         state: this.state.redirectParams
@@ -246,13 +311,13 @@ class App extends Component {
 
     return (
       <div className="App">
-        <img class='page' src={backImg} alt=''></img>
+        <img className='page' src={backImg} alt=''></img>
 
-        <canvas id='canvas' class='canvas'></canvas>
+        <canvas id='canvas' className='canvas' onClick={this.onCanvasClick}></canvas>
 
-        <input type='text' id='name' onClick={this.onNameClick}/>
+        <input type='text' id='name' onClick={this.onNameClick} />
 
-        <button class='btn-start' onClick={this.onStartClick}>
+        <button className='btn-start' onClick={this.onStartClick}>
           <img src={this.state.btnImgSrc} alt=''></img>
         </button>
       </div>
