@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import $ from 'jquery';
 
 import {
   BrowserRouter as Router,
@@ -29,30 +30,74 @@ class Share extends Component {
     this.onRetClick = this.onRetClick.bind(this)
 
     let params = this.props.location.state
-    if (params && params.accuracy) {
+    if (params && params.recogResult) {
       this.state = {
-        desc: params.accuracy,
+        name: params.name != ''? params.name : '粉丝甲',
         userCnt: '  我是第' + params.userCnt + '位为祖国打 Call 的人',
         recogResult: params.recogResult
       }
     }
     else {
       this.state = {
-        desc: "对不起，你在说什么?",
-        userCnt: '我是第' + 8888 + '位为祖国打 Call 的人',
+        name: '粉丝甲',
+        userCnt: '对不起，你在说什么?',
         recogResult: "苟利国家生死以，岂因祸福避趋之",
       }
     }
   }
 
   componentDidMount() {
-    if (this.props.location.state.voiceId){
-      if (this.props.location.state.wechatVoice) {
+    let that = this
 
+    $.ajax({
+      url: global.constants.baseUrl + '/common/sign',
+      method: 'Post',
+      data: {
+        url: window.location.href.split('#')[0]
+      },
+      success: (res) => {
+        console.info('Get signature')
+        console.info(res)
+
+        if (res.code == 1) {
+          wx.config({
+            debug: false,
+            appId: res.data.appId,
+            timestamp: res.data.timestamp,
+            nonceStr: res.data.nonceStr,
+            signature: res.data.signature,
+            jsApiList: [
+              'playVoice', 'pauseVoice'
+            ]
+          })
+
+          wx.ready(() => {
+            that.setState({
+              wxReady: true
+            })
+          })
+
+          wx.error((res) => {
+            console.log(res)
+            that.setState({
+              wxReady: false
+            })
+          })
+        }
+      }
+    })
+
+    if (this.props.location.state.voiceId){
+      // wechat voice
+      if (this.props.location.state.wechatVoice) {
+        this.setState({
+          wechat: true,
+          voiceId: this.props.location.state.voiceId
+        })
       }
       else{
         this.setState({
-          voiceUrl: global.constants.baseUrl + 'voice/wavOfRecord?idRecord=' + this.props.location.state.voiceId
+          voiceUrl: global.constants.baseUrl + '/voice/wavOfRecord?idRecord=' + this.props.location.state.voiceId
           // voiceUrl: global.constants.baseUrl + 'voice/wavOfRecord?idRecord=61'
         })
       }
@@ -92,7 +137,7 @@ class Share extends Component {
     
     if (this.props.location.state.voiceId){
       if (this.props.location.state.wechatVoice) {
-        play = <button className='btn-play' onClick={this.onPlayClick}>play</button>
+        play = <audio id='audio' src='' controls="controls" onPlay={this.onPlayClick}></audio>
       }
       else{
         play = <audio id='audio' src={this.state.voiceUrl} preload='true' controls="controls"></audio>
@@ -102,16 +147,15 @@ class Share extends Component {
     return (
       <div>
         <img className='page' src={backImg} />
-        <div className='sim-desc'>
+        <div className='name-desc'>
           <img src={simBackImg} />
-          {this.state.desc}
+          {this.state.name}
         </div>
 
         <div className='user-cnt-desc'>
           <img className='badge' src={badgeImg} />
           <img className='user-cnt-desc-back' src={nthBackImg} />
           <div className='user-cnt-desc-text'>
-            <h2>{this.props.location.state.name}</h2>
             {this.state.userCnt}
           </div>
 

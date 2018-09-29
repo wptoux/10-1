@@ -121,19 +121,20 @@
   color:#916F11;
 }
 
-.sim-desc {
+.name-desc {
   position: absolute;
-  top: 4.1rem;
+  top: 10%;
   left: 0;
   right: 0;
   margin: auto;
   width: 55%;
-  height: 6rem;
+  height: 13%;
   text-align: center;
+  font-size: 1.2rem;
   line-height: 2rem;
 }
 
-.sim-desc img{
+.name-desc img{
   position: absolute;
   left: 0;
   top: 0;
@@ -144,12 +145,12 @@
 
 .user-cnt-desc {
   position: absolute;
-  top: 8rem;
+  top: 20%;
   left: 0;
   right: 0;
   margin: auto;
   width: 90%;
-  height: 5rem;
+  height: 12%;
 }
 
 .avatar {
@@ -187,9 +188,9 @@
   text-align: center;
 }
 
-.user-cnt-desc-text h2 {
+/* .user-cnt-desc-text h2 {
   margin: 0;
-}
+} */
 
 /* .user-cnt-desc text {
   display: table-cell;
@@ -200,12 +201,12 @@
 
 .recog-result {
   position: absolute;
-  top: 12.5rem;
+  top: 30%;
   left: 0;
   right: 0;
   margin: auto;
   width: 80%;
-  height: 10rem;
+  height: 23%;
 }
 
 .recog-result img{
@@ -234,15 +235,15 @@
 
 #audio {
   position: absolute;
-  top: 25rem;
+  top: 57%;
   left: 0; right: 0; margin: auto;
-  width: 50%;
-  height: 2rem;
+  width: 80%;
+  height: 3rem;
 }
 
 .btn-share-return {
   position: absolute;
-  bottom: 10rem;
+  top: 69%;
   width: 10rem;
   height: 3rem;
   left: 0;
@@ -262,6 +263,6 @@
   position: absolute;
   bottom: 3rem;
   right: 3rem;
-  width: 5rem;
-  height: 5rem;
+  width: 4.5rem;
+  height: 4.5rem;
 }

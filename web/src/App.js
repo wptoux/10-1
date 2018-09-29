@@ -8,6 +8,8 @@ import {
   Redirect
 } from 'react-router-dom'
 
+import wx from 'weixin-js-sdk'
+
 import './config'
 
 import './App.css';
@@ -63,16 +65,16 @@ class App extends Component {
     })
 
     $.ajax({
-      url: global.constants.baseUrl + '/voice/list?page=0',
+      url: global.constants.baseUrl + '/voice/record/list/latest',
       method: 'get',
       success: (res) => {
         console.info('Get barrage list status:')
         console.info(res)
 
         if (res.code == 1 && res.data.length > 0) {
-          let arr = that.shuffle(res.data).slice(0, 15)
+          let arr = res.data.slice(0, 15)
           let idx = 0
-          for (let d of res.data) {
+          for (let d of arr) {
             if (d.originalRecognizedString == '') {
               that.shoot(d.greeting.content, d, idx)
             }
@@ -118,11 +120,17 @@ class App extends Component {
       btnImgSrc: btnImgDown
     })
 
+    let name = ""
+
+    if (this.state.nameInput.value != '你的名字') {
+      name = this.state.nameInput.value
+    }
+
     this.setState({
       redirectTo: '/record',
       redirectParams: {
         barrageStatus: document.getElementById('canvas').toDataURL('image/png'),
-        name: this.state.nameInput.value
+        name: name
       }
     })
   }
@@ -156,36 +164,33 @@ class App extends Component {
 
         that.drawBarrage(barrageStyle)
         that.processBarrageEvent()
-        
+
       }, 30);
     }
 
   }
 
   processBarrageEvent() {
-    if (this.canvasClickEvent){
+    if (this.canvasClickEvent) {
       let rem = this.state.phoneWidth / 20
       let w = 10 * rem
       let h = 1.5 * rem
-  
+
       let x = this.canvasClickEvent.x
       let y = this.canvasClickEvent.y
-  
+
       for (let i = 0; i < barrageStyle.length; i++) {
         let b = barrageStyle[i]
-  
+
         if (b.left < x && b.left + w > x && b.top < y && b.top + h > y) {
           let name = ''
-          let acc = 1
           let content = ''
-          let userCnt = parseInt(Math.random() * 10000)
-  
+          let userCnt = 0
+
           if (b.detail) {
-            acc = b.detail.similarity
-  
+            userCnt = b.detail.id
             if (b.detail.user) {
               name = b.detail.user.nickName
-              userCnt = b.detail.user.id
             }
           }
 
@@ -195,24 +200,100 @@ class App extends Component {
           else {
             content = b.detail.originalRecognizedString
           }
-          
+
           clearInterval(timer)
-          this.setState({
-            redirectTo: '/share',
-            redirectParams: {
-              accuracy: parseInt(acc * 100) + '%',
-              userCnt: userCnt,
-              recogResult: content,
-              fromBarrage: true,
-              voiceId: b.detail.id,
-              name: name
-            }
-          })
+
+          if (b.detail.voiceUrl) {
+            this.downloadWeChatVoice(b.detail.voiceUrl,
+              (name, localId) => {
+                this.setState({
+                  redirectTo: '/share',
+                  redirectParams: {
+                    userCnt: userCnt,
+                    recogResult: content,
+                    fromBarrage: true,
+                    voiceId: localId,
+                    name: name,
+                    wechatVoice: true
+                  }
+                })
+              }
+            )
+          }
+          else {
+            this.setState({
+              redirectTo: '/share',
+              redirectParams: {
+                userCnt: userCnt,
+                recogResult: content,
+                fromBarrage: true,
+                voiceId: b.detail.id,
+                name: name
+              }
+            })
+          }
           break
         }
       }
       this.canvasClickEvent = null
     }
+  }
+
+  downloadWeChatVoice(voiceUrl, callBack) {
+    let that = this
+    // wechat remote voice
+    let sp = voiceUrl.split(':')
+
+    $.ajax({
+      url: global.constants.baseUrl + '/common/sign',
+      method: 'Post',
+      data: {
+        url: window.location.href.split('#')[0]
+      },
+      success: (res) => {
+        console.info('Get signature')
+        console.info(res)
+
+        if (res.code == 1) {
+          wx.config({
+            debug: false,
+            appId: res.data.appId,
+            timestamp: res.data.timestamp,
+            nonceStr: res.data.nonceStr,
+            signature: res.data.signature,
+            jsApiList: [
+              'downloadVoice'
+            ]
+          })
+
+          wx.ready(() => {
+            that.setState({
+              wxReady: true
+            })
+
+            wx.downloadVoice({
+              serverId: sp[1],
+              isShowProgressTips: 0,
+              success: (resDownload) => {
+                // that.setState({
+                //   wechat: true,
+                //   name: sp[0],
+                //   voiceId: resDownload.localId
+                // })
+                callBack(sp[0], resDownload.localId)
+              }
+            })
+          })
+
+          wx.error((res) => {
+            console.log(res)
+            that.setState({
+              wxReady: false
+            })
+          })
+        }
+      }
+    })
   }
 
   drawBarrage(barrageStyle) {

@@ -129,9 +129,7 @@ class Record extends Component {
 
     this.recordStartTime = new Date().getTime()
 
-    if (this.state.wxReady) {
-      wx.startRecord()
-    }
+    wx.startRecord()
   }
 
   onRecorderUp(e) {
@@ -149,47 +147,81 @@ class Record extends Component {
     let endTime = new Date().getTime()
 
     if ((endTime - this.recordStartTime) / 1000 > 1) {
-      if (this.state.wxReady) {
-        wx.stopRecord({
-          success: (res) => {
-            console.info('voice recorded')
-            console.info(res)
+      wx.stopRecord({
+        success: (resRecord) => {
+          console.info('voice recorded')
+          console.info(resRecord)
 
-            wx.uploadVoice({
-              localId: res.localId,
-              success: (res) => {
-                alert(res.serverId)
-              }
-            })
-            let voiceId = res.localId
+          wx.uploadVoice({
+            localId: resRecord.localId,
+            isShowProgressTips: 1,
+            success: (resServer) => {
+              console.info('uploaded record')
+              console.info(resServer)
+              wx.translateVoice({
+                localId: resRecord.localId,
+                isShowProgressTips: 1,
+                success: (resRecog) => {
+                  console.info('voice recognized')
+                  console.info(resRecog)
 
-            wx.translateVoice({
-              localId: res.localId,
-              isShowProgressTips: 1,
-              success: (res) => {
-                console.info('voice recognized')
-                console.info(res)
+                  that.setState({
+                    redirectTo: '/share',
+                    redirectParams: {
+                      userCnt: 99,
+                      recogResult: resRecog.translateResult,
+                      voiceId: resRecord.localId,
+                      name: that.props.location.state.name,
+                      wechatVoice: true
+                    }
+                  })
 
-                if (res.translateResult && res.translateResult != ''){
-                  let a = this.state.hintText
-                  let b = res.translateResult
-
-                  this.setState({
-                      redirectTo: '/share',
-                      redirectParams: {
-                        accuracy: parseInt(this.calcAcc(a, b) * 100) + '%',
-                        userCnt: parseInt(Math.random() * 10000),
-                        recogResult: b,
-                        voiceId: voiceId,
-                        name: this.props.location.state.name
+                  if (resRecog.translateResult && resRecog.translateResult != '') {
+                    $.ajax({
+                      url: global.constants.baseUrl + '/voice/record/create',
+                      method: 'Post',
+                      data: {
+                        url: that.props.location.state.name + ':' + resServer,
+                        content: resRecog.translateResult
+                      },
+                      success: (resCreate) => {
+                        console.info('resource created')
+                        console.info(resCreate)
+                        if (resCreate.code == 1) {
+                          // that.setState({
+                          //   redirectTo: '/share',
+                          //   redirectParams: {
+                          //     userCnt: resCreate.data,
+                          //     recogResult: resRecog.translateResult,
+                          //     voiceId: resRecord.localId,
+                          //     name: that.props.location.state.name,
+                          //     wechatVoice: true
+                          //   }
+                          // })
+                        }
                       }
                     })
+
+                    // let a = this.state.hintText
+                    // let b = res.translateResult
+
+                    // this.setState({
+                    //     redirectTo: '/share',
+                    //     redirectParams: {
+                    //       accuracy: parseInt(this.calcAcc(a, b) * 100) + '%',
+                    //       userCnt: parseInt(Math.random() * 10000),
+                    //       recogResult: b,
+                    //       voiceId: voiceId,
+                    //       name: this.props.location.state.name
+                    //     }
+                    //   })
+                  }
                 }
-              }
-            })
-          }
-        })
-      }
+              })
+            }
+          })
+        }
+      })
     }
   }
 
@@ -208,11 +240,11 @@ class Record extends Component {
     }
   }
 
-  calcAcc(str, baseStr){
+  calcAcc(str, baseStr) {
     let n = Math.min(str.length, baseStr.length)
     let i = 0
-    for (; i < n; i++){
-      if (str[i] != baseStr[i]){
+    for (; i < n; i++) {
+      if (str[i] != baseStr[i]) {
         break
       }
     }
