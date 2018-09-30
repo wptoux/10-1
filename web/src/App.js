@@ -265,12 +265,12 @@ class App extends Component {
     for (var i = 0; i < barrageStyle.length; i++) {
       barrageStyle[i].left += barrageStyle[i].speed
 
-      if (barrageStyle[i].speed > 5) {
+      if (barrageStyle[i].speed > 4) {
         barrageStyle[i].speed -= 0.1
       }
 
-      if (barrageStyle[i].speed > 8) {
-        barrageStyle[i].speed = 8
+      if (barrageStyle[i].speed > 6) {
+        barrageStyle[i].speed = 6
       }
 
       if (barrageStyle[i].left > this.state.phoneWidth) {
@@ -286,7 +286,7 @@ class App extends Component {
       for (let idx1 of r) {
         let b1 = barrageStyle[idx1]
 
-        if (b1.left < -30 * rem) {
+        if (b1.left < -40 * rem) {
           continue
         }
 
