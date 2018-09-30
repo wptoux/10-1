@@ -10,9 +10,13 @@ import {
 
 import wx from 'weixin-js-sdk'
 
+// import VConsole from 'vconsole'
+
 import './config'
 
 import './App.css';
+
+import { init_wx } from './wechat'
 
 import Record from './Record'
 
@@ -21,12 +25,16 @@ import btnImg from './assets/start_btn.png';
 import btnImgDown from './assets/start_btn_down.png';
 import barrageBack from './assets/barrage_back.png'
 
+let N_BARRAGE_ROAD = 15
 let barrageStyle = []
 let timer = null
 
 class App extends Component {
   constructor(props) {
     super(props);
+
+    // let vc = new VConsole()
+
     this.onStartClick = this.onStartClick.bind(this)
     this.onNameClick = this.onNameClick.bind(this)
     this.onCanvasClick = this.onCanvasClick.bind(this)
@@ -34,10 +42,18 @@ class App extends Component {
     this.state = {
       btnImgSrc: btnImg
     }
+
+
+    this.barrageRoads = new Array(N_BARRAGE_ROAD)
+    for (let i = 0; i < N_BARRAGE_ROAD; i++) {
+      this.barrageRoads[i] = new Set()
+    }
   }
 
   componentDidMount() {
     let that = this
+
+    init_wx(window.location.href.split('#')[0])
 
     barrageStyle = []
 
@@ -72,9 +88,8 @@ class App extends Component {
         console.info(res)
 
         if (res.code == 1 && res.data.length > 0) {
-          let arr = res.data.slice(0, 15)
           let idx = 0
-          for (let d of arr) {
+          for (let d of res.data) {
             if (d.originalRecognizedString == '') {
               that.shoot(d.greeting.content, d, idx)
             }
@@ -84,18 +99,18 @@ class App extends Component {
             idx += 1
           }
         } else {
-          let texts = ["123", "234", "345", "456", "678", "一二三四五六七八九十一二三四"]
-          for (let i = 0; i < texts.length; i++) {
-            that.shoot(texts[i], "", "", i)
+          for (let i = 0; i < 50; i++) {
+            that.shoot(parseInt(Math.random() * 1000000), "", i)
           }
+  
+          this.startAnimation()
         }
 
         this.startAnimation()
       },
       error: (res) => {
-        let texts = ["123", "234", "345", "456", "678", "一二三四五六七八九十一二三四"]
-        for (let i = 0; i < texts.length; i++) {
-          that.shoot(texts[i], "", "", i)
+        for (let i = 0; i < 50; i++) {
+          that.shoot(parseInt(Math.random() * 1000000) + '', "", i)
         }
 
         this.startAnimation()
@@ -105,13 +120,8 @@ class App extends Component {
   }
 
   componentDidUpdate() {
-    // let img = new Image()
-    // img.src = barrageBack
-    // img.onload = () => {
-    //   this.setState({
-    //     barrageBackImg: img
-    //   })
-    // }
+    let that = this
+
   }
 
   onStartClick() {
@@ -142,6 +152,7 @@ class App extends Component {
   }
 
   startAnimation() {
+    let that = this
     let img = new Image()
     img.src = barrageBack
     img.onload = () => {
@@ -149,25 +160,13 @@ class App extends Component {
         barrageBackImg: img
       })
 
-      var that = this
       timer = setInterval(function () {
-        let rem = that.state.phoneWidth / 20
-        for (var i = 0; i < barrageStyle.length; i++) {
-          barrageStyle[i].left += barrageStyle[i].speed
-
-          if (barrageStyle[i].left > that.state.phoneWidth) {
-            barrageStyle[i].top = parseInt(Math.random() * 15) * rem * 1.2
-            barrageStyle[i].left = 0
-            barrageStyle[i].speed = Math.random() * 2 + 2
-          }
-        }
-
+        that.updateBarrage(barrageStyle)
         that.drawBarrage(barrageStyle)
         that.processBarrageEvent()
 
       }, 30);
     }
-
   }
 
   processBarrageEvent() {
@@ -244,56 +243,75 @@ class App extends Component {
     // wechat remote voice
     let sp = voiceUrl.split(':')
 
-    $.ajax({
-      url: global.constants.baseUrl + '/common/sign',
-      method: 'Post',
-      data: {
-        url: window.location.href.split('#')[0]
-      },
-      success: (res) => {
-        console.info('Get signature')
-        console.info(res)
-
-        if (res.code == 1) {
-          wx.config({
-            debug: false,
-            appId: res.data.appId,
-            timestamp: res.data.timestamp,
-            nonceStr: res.data.nonceStr,
-            signature: res.data.signature,
-            jsApiList: [
-              'downloadVoice'
-            ]
-          })
-
-          wx.ready(() => {
-            that.setState({
-              wxReady: true
-            })
-
-            wx.downloadVoice({
-              serverId: sp[1],
-              isShowProgressTips: 0,
-              success: (resDownload) => {
-                // that.setState({
-                //   wechat: true,
-                //   name: sp[0],
-                //   voiceId: resDownload.localId
-                // })
-                callBack(sp[0], resDownload.localId)
-              }
-            })
-          })
-
-          wx.error((res) => {
-            console.log(res)
-            that.setState({
-              wxReady: false
-            })
-          })
-        }
+    wx.downloadVoice({
+      serverId: sp[1],
+      isShowProgressTips: 1,
+      success: (resDownload) => {
+        // that.setState({
+        //   wechat: true,
+        //   name: sp[0],
+        //   voiceId: resDownload.localId
+        // })
+        callBack(sp[0], resDownload.localId)
       }
     })
+  }
+
+  updateBarrage(barrageStyle) {
+    let rem = this.state.phoneWidth / 20
+    let roadH = 1.5 * rem
+    let barrageW = 10 * rem
+
+    for (var i = 0; i < barrageStyle.length; i++) {
+      barrageStyle[i].left += barrageStyle[i].speed
+
+      if (barrageStyle[i].speed > 5) {
+        barrageStyle[i].speed -= 0.1
+      }
+
+      if (barrageStyle[i].speed > 8) {
+        barrageStyle[i].speed = 8
+      }
+
+      if (barrageStyle[i].left > this.state.phoneWidth) {
+        this.leaveRoad(barrageStyle[i].road, i)
+        barrageStyle[i].top = this.enterRoad(i) * roadH
+        barrageStyle[i].left = -5 * this.state.phoneWidth
+        barrageStyle[i].speed = Math.random() * 2 + 2
+      }
+    }
+
+    //碰撞检测
+    for (let r of this.barrageRoads) {
+      for (let idx1 of r) {
+        let b1 = barrageStyle[idx1]
+
+        if (b1.left < -30 * rem) {
+          continue
+        }
+
+        for (let idx2 of r) {
+          if (idx1 == idx2) {
+            continue
+          }
+
+          let b2 = barrageStyle[idx2]
+
+          if (b1.left < b2.left && b1.left + barrageW > b2.left) {
+            // let m1 = b1.text.length
+            // let m2 = b2.text.length
+
+            // b1.speed = ((m1 - m2) * b1.speed + 2 * m2 * b2.speed) / (m1 + m2)
+            // b2.speed = ((m2 - m1) * b2.speed + 2 * m1 * b1.speed) / (m1 + m2)
+
+            b2.left += 1
+            let s = b1.speed
+            b1.speed = b2.speed
+            b2.speed = s + 1
+          }
+        }
+      }
+    }
   }
 
   drawBarrage(barrageStyle) {
@@ -303,6 +321,10 @@ class App extends Component {
     let rem = this.state.phoneWidth / 20
 
     function _drawItem(x, y, avatar, text) {
+      if (x < -10 * rem || y < 0) {
+        return
+      }
+
       c.drawImage(that.state.barrageBackImg, x, y, 10 * rem, 1.5 * rem)
       // c.drawImage(avatar, x + 2.1 * rem, y + 1.25 * rem, rem, rem)
       c.font = 0.8 * rem + 'px consolas'
@@ -337,14 +359,23 @@ class App extends Component {
       //字体颜色随机
       // var textColor = "rgb(" + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + "," + parseInt(Math.random() * 256) + ")";
       let rem = that.state.phoneWidth / 20
-      var top = idx * rem * 1.2
+
+      let roadH = 1.5 * rem
+
+      // let road = that.enterRoad()
+      // let top = road * roadH
+
+      let road = that.enterRoad(idx)
+      let top = road * roadH
+
       var barrageStyleObj = {
         top: top,
-        left: (Math.random()) * that.state.phoneWidth * 0.5,
+        left: ((Math.random()) * that.state.phoneWidth * 5) - 4.5 * that.state.phoneWidth,
         text: text,
         speed: Math.random() * 2 + 2,
         color: "#FFFFFF",
-        detail: detail
+        detail: detail,
+        road: road
       };
 
       barrageStyle.push(barrageStyleObj)
@@ -366,19 +397,22 @@ class App extends Component {
     // }
   }
 
-  /**
-   * Shuffles array in place.
-   * @param {Array} a items An array containing the items.
-   */
-  shuffle(a) {
-    var j, x, i;
-    for (i = a.length - 1; i > 0; i--) {
-      j = Math.floor(Math.random() * (i + 1));
-      x = a[i];
-      a[i] = a[j];
-      a[j] = x;
+  enterRoad(idx) {
+    let n = 1000
+    let p = 0
+    for (let i = parseInt(Math.random() * N_BARRAGE_ROAD); i < this.barrageRoads.length; i++) {
+      if (this.barrageRoads[i].size < n) {
+        n = this.barrageRoads[i].size
+        p = i
+      }
     }
-    return a;
+
+    this.barrageRoads[p].add(idx)
+    return p
+  }
+
+  leaveRoad(road, idx) {
+    this.barrageRoads[road].delete(idx)
   }
 
   render() {

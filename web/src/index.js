@@ -10,6 +10,7 @@ import {
   Link,
   Redirect
 } from 'react-router-dom'
+
 import Record from './Record';
 import Share from './Share';
 

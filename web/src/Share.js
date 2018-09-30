@@ -12,15 +12,18 @@ import wx from 'weixin-js-sdk'
 
 import './config'
 
+import { init_wx } from './wechat'
+
 import backImg from './assets/background.jpg'
 import badgeImg from './assets/badge.png'
 import qrcode from './assets/qrcode.png'
 import recRstBackImg from './assets/recog_result_back.png'
 import simBackImg from './assets/sim_txt_back.png'
 import nthBackImg from './assets/you_re_the_xxxth.png'
-
-import btnImg from './assets/start_btn.png';
-import btnImgDown from './assets/start_btn_down.png';
+import btnImg from './assets/start_btn.png'
+import btnImgDown from './assets/start_btn_down.png'
+import playBtn from './assets/play.png'
+import pauseBtn from './assets/pause.png'
 
 class Share extends Component {
   constructor(props) {
@@ -32,8 +35,8 @@ class Share extends Component {
     let params = this.props.location.state
     if (params && params.recogResult) {
       this.state = {
-        name: params.name != ''? params.name : '粉丝甲',
-        userCnt: '  我是第' + params.userCnt + '位为祖国打 Call 的人',
+        name: params.name != '' ? params.name : '粉丝甲',
+        userCnt: '  我是第' + params.userCnt + '位为祖国送祝福的人',
         recogResult: params.recogResult
       }
     }
@@ -44,50 +47,30 @@ class Share extends Component {
         recogResult: "苟利国家生死以，岂因祸福避趋之",
       }
     }
+
+    this.playState = 0
+
+    wx.onVoicePlayEnd({
+      success: (res) => {
+        this.playState = 0
+        this.setState({
+          playBtnSrc: playBtn
+        })
+      }
+    })
   }
 
   componentDidMount() {
     let that = this
 
-    $.ajax({
-      url: global.constants.baseUrl + '/common/sign',
-      method: 'Post',
-      data: {
-        url: window.location.href.split('#')[0]
-      },
-      success: (res) => {
-        console.info('Get signature')
-        console.info(res)
+    let u = navigator.userAgent
+    let isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
 
-        if (res.code == 1) {
-          wx.config({
-            debug: false,
-            appId: res.data.appId,
-            timestamp: res.data.timestamp,
-            nonceStr: res.data.nonceStr,
-            signature: res.data.signature,
-            jsApiList: [
-              'playVoice', 'pauseVoice'
-            ]
-          })
+    if (!isiOS) {
+      init_wx(window.location.href.split('#')[0])
+    }
 
-          wx.ready(() => {
-            that.setState({
-              wxReady: true
-            })
-          })
-
-          wx.error((res) => {
-            console.log(res)
-            that.setState({
-              wxReady: false
-            })
-          })
-        }
-      }
-    })
-
-    if (this.props.location.state.voiceId){
+    if (this.props.location.state.voiceId) {
       // wechat voice
       if (this.props.location.state.wechatVoice) {
         this.setState({
@@ -95,7 +78,7 @@ class Share extends Component {
           voiceId: this.props.location.state.voiceId
         })
       }
-      else{
+      else {
         this.setState({
           voiceUrl: global.constants.baseUrl + '/voice/wavOfRecord?idRecord=' + this.props.location.state.voiceId
           // voiceUrl: global.constants.baseUrl + 'voice/wavOfRecord?idRecord=61'
@@ -104,17 +87,39 @@ class Share extends Component {
     }
 
     this.setState({
-      btnImgSrc: btnImg
+      btnImgSrc: btnImg,
+      playBtnSrc: playBtn
     })
   }
 
   onPlayClick() {
-    if (this.props.location.state.voiceId){
-      if (this.props.location.state.wechatVoice) {
-        wx.playVoice({
-          localId: this.props.location.state.voiceId
-        })
+    if (this.playState == 0){
+      this.playState = 1
+      if (this.props.location.state.voiceId) {
+        if (this.props.location.state.wechatVoice) {
+          wx.playVoice({
+            localId: this.props.location.state.voiceId
+          })
+        }
       }
+
+      this.setState({
+        playBtnSrc: pauseBtn
+      })
+    }
+    else{
+      this.playState = 0
+      if (this.props.location.state.voiceId) {
+        if (this.props.location.state.wechatVoice) {
+          wx.pauseVoice({
+            localId: this.props.location.state.voiceId
+          })
+        }
+      }
+
+      this.setState({
+        playBtnSrc: playBtn
+      })
     }
   }
 
@@ -133,16 +138,20 @@ class Share extends Component {
       }} />)
     }
 
-    let play = null
-    
-    if (this.props.location.state.voiceId){
-      if (this.props.location.state.wechatVoice) {
-        play = <audio id='audio' src='' controls="controls" onPlay={this.onPlayClick}></audio>
-      }
-      else{
-        play = <audio id='audio' src={this.state.voiceUrl} preload='true' controls="controls"></audio>
-      }
-    }
+    let play = <button className='btn-play' onClick={this.onPlayClick}>
+      <img src={this.state.playBtnSrc} />
+    </button>
+
+    // if (this.props.location.state.voiceId){
+    //   if (this.props.location.state.wechatVoice) {
+    //     play = <button className='btn-play' onClick={this.onPlayClick}>
+    //       <img src={playBtn}/>
+    //     </button>
+    //   }
+    //   else{
+    //     play = <audio id='audio' src={this.state.voiceUrl} preload='true' controls="controls"></audio>
+    //   }
+    // }
 
     return (
       <div>
@@ -171,8 +180,8 @@ class Share extends Component {
         {play}
 
         {this.props.location.state.fromBarrage && (<button className='btn-share-return' onClick={this.onRetClick}>
-            <img src={this.state.btnImgSrc} alt=''></img>
-          </button>)
+          <img src={this.state.btnImgSrc} alt=''></img>
+        </button>)
         }
         <img className='qrcode' src={qrcode} />
       </div>

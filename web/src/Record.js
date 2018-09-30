@@ -13,6 +13,8 @@ import wx from 'weixin-js-sdk'
 import './config'
 import './App.css'
 
+import {init_wx} from './wechat'
+
 import backImg from './assets/background.jpg';
 import hintImg from './assets/hint_back.png';
 import recordBtnImg from './assets/recorder.png';
@@ -33,54 +35,25 @@ class Record extends Component {
     }
 
     this.recordStatus = 0
-
-    $.ajax({
-      url: global.constants.baseUrl + '/common/sign',
-      method: 'Post',
-      data: {
-        url: window.location.href.split('#')[0]
-      },
-      success: (res) => {
-        console.info('Get signature')
-        console.info(res)
-
-        if (res.code == 1) {
-          wx.config({
-            debug: false,
-            appId: res.data.appId,
-            timestamp: res.data.timestamp,
-            nonceStr: res.data.nonceStr,
-            signature: res.data.signature,
-            jsApiList: [
-              'startRecord', 'stopRecord', 'onVoiceRecordEnd',
-              'playVoice', 'stopVoice', 'onVoicePlayEnd', 'uploadVoice',
-              'translateVoice'
-            ]
-          })
-
-          wx.ready(() => {
-            that.setState({
-              wxReady: true
-            })
-
-            wx.onVoiceRecordEnd({
-              complete: (res) => {
-              }
-            })
-          })
-
-          wx.error((res) => {
-            console.log(res)
-            that.setState({
-              wxReady: false
-            })
-          })
-        }
-      }
-    })
   }
 
   componentDidMount() {
+    let that = this
+
+    let u = navigator.userAgent
+    let isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
+
+    if (!isiOS) {
+      init_wx(window.location.href.split('#')[0],
+        () => {
+          wx.onVoiceRecordEnd({
+            complete: (res) => {
+              that.processRecord(res)
+            }
+          })
+        })
+    }
+
     this.refreshHinter()
   }
 
@@ -148,80 +121,13 @@ class Record extends Component {
 
     if ((endTime - this.recordStartTime) / 1000 > 1) {
       wx.stopRecord({
-        success: (resRecord) => {
-          console.info('voice recorded')
-          console.info(resRecord)
-
-          wx.uploadVoice({
-            localId: resRecord.localId,
-            isShowProgressTips: 1,
-            success: (resServer) => {
-              console.info('uploaded record')
-              console.info(resServer)
-              wx.translateVoice({
-                localId: resRecord.localId,
-                isShowProgressTips: 1,
-                success: (resRecog) => {
-                  console.info('voice recognized')
-                  console.info(resRecog)
-
-                  that.setState({
-                    redirectTo: '/share',
-                    redirectParams: {
-                      userCnt: 99,
-                      recogResult: resRecog.translateResult,
-                      voiceId: resRecord.localId,
-                      name: that.props.location.state.name,
-                      wechatVoice: true
-                    }
-                  })
-
-                  if (resRecog.translateResult && resRecog.translateResult != '') {
-                    $.ajax({
-                      url: global.constants.baseUrl + '/voice/record/create',
-                      method: 'Post',
-                      data: {
-                        url: that.props.location.state.name + ':' + resServer,
-                        content: resRecog.translateResult
-                      },
-                      success: (resCreate) => {
-                        console.info('resource created')
-                        console.info(resCreate)
-                        if (resCreate.code == 1) {
-                          // that.setState({
-                          //   redirectTo: '/share',
-                          //   redirectParams: {
-                          //     userCnt: resCreate.data,
-                          //     recogResult: resRecog.translateResult,
-                          //     voiceId: resRecord.localId,
-                          //     name: that.props.location.state.name,
-                          //     wechatVoice: true
-                          //   }
-                          // })
-                        }
-                      }
-                    })
-
-                    // let a = this.state.hintText
-                    // let b = res.translateResult
-
-                    // this.setState({
-                    //     redirectTo: '/share',
-                    //     redirectParams: {
-                    //       accuracy: parseInt(this.calcAcc(a, b) * 100) + '%',
-                    //       userCnt: parseInt(Math.random() * 10000),
-                    //       recogResult: b,
-                    //       voiceId: voiceId,
-                    //       name: this.props.location.state.name
-                    //     }
-                    //   })
-                  }
-                }
-              })
-            }
-          })
+        success: (res) => {
+          that.processRecord(res)
         }
       })
+    }
+    else {
+      wx.stopRecord()
     }
   }
 
@@ -238,6 +144,71 @@ class Record extends Component {
     if (this.state.wxReady) {
       wx.stopRecord()
     }
+  }
+
+  processRecord(resRecord) {
+    let that = this
+
+    console.info('voice recorded')
+    console.info(resRecord)
+
+    wx.uploadVoice({
+      localId: resRecord.localId,
+      isShowProgressTips: 1,
+      success: (resServer) => {
+        console.info('uploaded record')
+        console.info(resServer)
+        wx.translateVoice({
+          localId: resRecord.localId,
+          isShowProgressTips: 1,
+          success: (resRecog) => {
+            console.info('voice recognized')
+            console.info(resRecog)
+
+            if (resRecog.translateResult && resRecog.translateResult != '') {
+              $.ajax({
+                url: global.constants.baseUrl + '/voice/record/create',
+                method: 'Post',
+                data: {
+                  url: that.props.location.state.name + ':' + resServer.serverId,
+                  content: resRecog.translateResult
+                },
+                success: (resCreate) => {
+                  console.info('resource created')
+                  console.info(resCreate)
+                  if (resCreate.code == 1) {
+                    that.setState({
+                      redirectTo: '/share',
+                      redirectParams: {
+                        userCnt: resCreate.data,
+                        recogResult: resRecog.translateResult,
+                        voiceId: resRecord.localId,
+                        name: that.props.location.state.name,
+                        wechatVoice: true
+                      }
+                    })
+                  }
+                }
+              })
+
+              // let a = this.state.hintText
+              // let b = res.translateResult
+
+              // this.setState({
+              //     redirectTo: '/share',
+              //     redirectParams: {
+              //       accuracy: parseInt(this.calcAcc(a, b) * 100) + '%',
+              //       userCnt: parseInt(Math.random() * 10000),
+              //       recogResult: b,
+              //       voiceId: voiceId,
+              //       name: this.props.location.state.name
+              //     }
+              //   })
+            }
+          }
+        })
+      }
+    })
   }
 
   calcAcc(str, baseStr) {

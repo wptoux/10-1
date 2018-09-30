@@ -229,8 +229,18 @@
 
 .btn-play {
   position: absolute;
-  top: 25rem;
-  left: 3rem;
+  top: 57%;
+  left: 0; right: 0; margin: auto;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+}
+
+.btn-play img {
+  width: 100%;
+  height: 100%;
 }
 
 #audio {
