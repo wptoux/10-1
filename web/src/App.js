@@ -266,7 +266,7 @@ class App extends Component {
       barrageStyle[i].left += barrageStyle[i].speed
 
       if (barrageStyle[i].speed > 4) {
-        barrageStyle[i].speed -= 0.1
+        barrageStyle[i].speed -= 0.2
       }
 
       if (barrageStyle[i].speed > 6) {
