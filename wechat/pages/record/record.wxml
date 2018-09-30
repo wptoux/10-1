@@ -6,7 +6,7 @@
   <block wx:for="{{barrageStyle}}" wx:key="unique">
     <view class="barrage-fly-obj" style="color:{{item.color}};left:{{item.left}}px;top:{{item.top}}px;">
       <view class="barrage-content">
-        <image src="{{item.avatar}}"></image>
+        <!-- <image src="{{item.avatar}}"></image> -->
         <text>{{item.text}}</text>
       </view>
       <image class='barrage-back' src="{{barrageBackImgSrc}}" />

@@ -25,17 +25,16 @@
 
 .barrage-fly-obj {
   position: absolute;
-  width: 12.5rem;
-  height: 2.5rem;
+  width: 10rem;
+  height: 1.5rem;
   overflow: hidden;
 }
 
 .barrage-content {
   position: absolute;
-  top: 1.25rem;
-  left: 2.1rem;
   width: 9rem;
   height: 1.5rem;
+  line-height: 1.5rem;
 }
 
 .barrage-content image {
